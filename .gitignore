@@ -1,0 +1,16 @@
+/addons
+/log
+/public
+/runtime
+/thinkphp
+/vendor
+/.bowerrc
+/.env.sample
+/.user.ini
+/bower.json
+/build.php
+/composer.json
+/LICENSE
+/README.md
+/think
+/.idea
