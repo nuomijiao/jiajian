@@ -25,3 +25,12 @@
 //];
 
 use think\Route;
+
+
+//发送验证码
+Route::post('api/:version/sendsms', 'jjapi/:version.Sms/sendSms');
+
+//注册
+Route::post('api/:version/register', 'jjapi/:version.LogAndReg/register');
+//登录
+Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
