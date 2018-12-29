@@ -7,12 +7,16 @@
  */
 
 return [
-    'sms_AKID' => '',
-    'sms_AKS' => '',
+    'sms_AKID' => 'LTAIBlS6U5FdTS5R',
+    'sms_AKS' => 'B9f7U61w2B2mx6Mztn3zxR1Ybx0Cjr',
     //签名
-    'sms_SN' => '',
+    'sms_SN' => '龙泰',
+
     //模板
-    'sms_TC1' => '',
+    //注册
+    'sms_TC1' => 'SMS_153716245',
+    //忘记密码
+    'sms_TC2' => 'SMS_153716245',
     //验证码长度
     'sms_KL' => 6,
     //验证码过期时间

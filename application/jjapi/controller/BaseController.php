@@ -13,5 +13,11 @@ use think\Controller;
 
 class BaseController extends Controller
 {
-
+    public function jjreturn($param)
+    {
+        return json([
+            'error_code'=>'Success',
+            'data'=> $param
+        ]);
+    }
 }
