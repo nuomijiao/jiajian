@@ -23,7 +23,7 @@ class WhUser extends BaseModel
 
     public static function checkUser($mobile, $pwd)
     {
-        $user = self::where(['mobile'=>$mobile, 'user_pwd'=>md5(md5($pwd))])->find();
+        $user = self::where(['mobile'=>$mobile, 'pwd'=>md5(md5($pwd))])->find();
         return $user;
     }
 
