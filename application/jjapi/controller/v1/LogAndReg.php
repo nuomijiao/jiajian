@@ -107,14 +107,14 @@ class LogAndReg extends BaseController
         }
         //检查手机号码是否被注册
         $user = WhUser::checkUserByMobile($mobile);
-        if (!$user) {
+        if ($user) {
             throw new UserException([
-                'msg' => '手机号码还未注册',
+                'msg' => '手机号码已经注册',
                 'errorCode' => 30001,
             ]);
         }
         //检查验证码是否正确
-        $codeInfo = WhSmscode::checkCode($mobile, $code, SmsCodeTypeEnum::ToRegister);
+        $codeInfo = WhSmscode::checkCode($mobile, $code, SmsCodeTypeEnum::ToResetPwd);
         if (!$codeInfo || $codeInfo['validate_code'] != $code || $codeInfo['expire_time'] < time() || $codeInfo['using_time'] > 0) {
             throw new UserException([
                 'msg' => '验证码不匹配或已过期',
@@ -123,16 +123,15 @@ class LogAndReg extends BaseController
         } else {
             $timenow = time();
             //修改验证码使用状态
-            WhSmscode::changeStatus($mobile, $code, SmsCodeTypeEnum::ToRegister, $timenow);
-            //新增用户数据库
+            WhSmscode::changeStatus($mobile, $code, SmsCodeTypeEnum::ToResetPwd, $timenow);
             $dataArray = [
-                'mobile' => $mobile, 'pwd' => md5(md5($pwd)),
-                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png',
+                'id' => $user->id,
+                'pwd' => md5(md5($pwd)),
             ];
-            $user = WhUser::create($dataArray);
+            $user = WhUser::update($dataArray);
             if ($user) {
                 throw new SuccessMessage([
-                    'msg' => '注册成功',
+                    'msg' => '修改成功',
                 ]);
             }
         }

@@ -34,3 +34,5 @@ Route::post('api/:version/sendsms', 'jjapi/:version.Sms/sendSms');
 Route::post('api/:version/register', 'jjapi/:version.LogAndReg/register');
 //登录
 Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
+//忘记密码
+Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd')
