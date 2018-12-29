@@ -95,21 +95,9 @@ class LogAndReg extends BaseController
     }
 
 
-
-    private static function randUserName()
-    {
-        $userName = "xd_".self::getRandChar(6);
-        $user = WhUser::checkUserByUserName($userName);
-        if ($user) {
-            self::randUserName();
-        } else {
-            return $userName;
-        }
-    }
-
     private static function randIdNumber()
     {
-        $IdNumber = "xudu_".self::getRandChar(6);
+        $IdNumber = "jj_".self::getRandChar(6);
         $user = WhUser::checkUserByIdNumber($IdNumber);
         if ($user) {
             self::randIdNumber();
