@@ -17,13 +17,13 @@ class WhUser extends BaseModel
 
     public static function checkUserByMobile($mobile)
     {
-        $user = self::where('mobile_number', '=', $mobile)->find();
+        $user = self::where('mobile', '=', $mobile)->find();
         return $user;
     }
 
     public static function checkUser($mobile, $pwd)
     {
-        $user = self::where(['mobile_number'=>$mobile, 'user_pwd'=>md5(md5($pwd))])->find();
+        $user = self::where(['mobile'=>$mobile, 'user_pwd'=>md5(md5($pwd))])->find();
         return $user;
     }
 
