@@ -107,10 +107,10 @@ class LogAndReg extends BaseController
         }
         //检查手机号码是否被注册
         $user = WhUser::checkUserByMobile($mobile);
-        if ($user) {
+        if (!$user) {
             throw new UserException([
-                'msg' => '手机号码已经注册',
-                'errorCode' => 30001,
+                'msg' => '手机号码还未注册',
+                'errorCode' => 30002,
             ]);
         }
         //检查验证码是否正确
