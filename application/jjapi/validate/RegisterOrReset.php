@@ -9,7 +9,7 @@
 namespace app\jjapi\validate;
 
 
-class RegisterNew extends BaseValidate
+class RegisterOrReset extends BaseValidate
 {
     protected $rule = [
         'mobile' => 'require|isMobile',

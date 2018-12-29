@@ -10,11 +10,11 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
-use app\jjapi\model\WhSmsCode;
+use app\jjapi\model\WhSmscode;
 use app\jjapi\model\WhUser;
 use app\jjapi\service\UserToken;
 use app\jjapi\validate\LoginTokenGet;
-use app\jjapi\validate\RegisterNew;
+use app\jjapi\validate\RegisterOrReset;
 use app\lib\enum\SmsCodeTypeEnum;
 use app\lib\exception\SuccessMessage;
 use app\lib\exception\UserException;
@@ -28,7 +28,7 @@ class LogAndReg extends BaseController
         //2.判断验证码是否正确
         //3.账号密码加密新增数据库
         //4.注册成功，即生成token返回给客户端，保存登陆状态
-        (new RegisterNew())->goCheck();
+        (new RegisterOrReset())->goCheck();
         //检查两次密码是否一致
         if ($pwd !== $pwd1) {
             throw new UserException([
@@ -45,7 +45,7 @@ class LogAndReg extends BaseController
             ]);
         }
         //检查验证码是否正确
-        $codeInfo = WhSmsCode::checkCode($mobile, $code, SmsCodeTypeEnum::ToRegister);
+        $codeInfo = WhSmscode::checkCode($mobile, $code, SmsCodeTypeEnum::ToRegister);
         if (!$codeInfo || $codeInfo['validate_code'] != $code || $codeInfo['expire_time'] < time() || $codeInfo['using_time'] > 0) {
             throw new UserException([
                 'msg' => '验证码不匹配或已过期',
@@ -91,6 +91,50 @@ class LogAndReg extends BaseController
             $log = new UserToken();
             $token = $log->getToken($user->id);
             return $this->jjreturn(['token'=>$token]);
+        }
+    }
+
+
+    public function resetPwd($mobile = '', $pwd = '', $pwd1 = '', $code = '')
+    {
+        (new RegisterOrReset())->goCheck();
+        //检查两次密码是否一致
+        if ($pwd !== $pwd1) {
+            throw new UserException([
+                'msg' => '两次密码不一致',
+                'errorCode' => 30004,
+            ]);
+        }
+        //检查手机号码是否被注册
+        $user = WhUser::checkUserByMobile($mobile);
+        if (!$user) {
+            throw new UserException([
+                'msg' => '手机号码还未注册',
+                'errorCode' => 30001,
+            ]);
+        }
+        //检查验证码是否正确
+        $codeInfo = WhSmscode::checkCode($mobile, $code, SmsCodeTypeEnum::ToRegister);
+        if (!$codeInfo || $codeInfo['validate_code'] != $code || $codeInfo['expire_time'] < time() || $codeInfo['using_time'] > 0) {
+            throw new UserException([
+                'msg' => '验证码不匹配或已过期',
+                'errorCode' => 30005,
+            ]);
+        } else {
+            $timenow = time();
+            //修改验证码使用状态
+            WhSmscode::changeStatus($mobile, $code, SmsCodeTypeEnum::ToRegister, $timenow);
+            //新增用户数据库
+            $dataArray = [
+                'mobile' => $mobile, 'pwd' => md5(md5($pwd)),
+                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png',
+            ];
+            $user = WhUser::create($dataArray);
+            if ($user) {
+                throw new SuccessMessage([
+                    'msg' => '注册成功',
+                ]);
+            }
         }
     }
 

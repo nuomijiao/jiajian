@@ -10,7 +10,7 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
-use app\jjapi\model\WhSmsCode;
+use app\jjapi\model\WhSmscode;
 use app\jjapi\model\WhUser;
 use app\jjapi\validate\SmsCode;
 use app\lib\enum\SmsCodeTypeEnum;
@@ -41,7 +41,7 @@ class Sms extends BaseController
             }
         }
 
-        $mobile_count = WhSmsCode::checkByMobile($mobile, $type);
+        $mobile_count = WhSmscode::checkByMobile($mobile, $type);
         if ($mobile_count > config('aliyun.sms_mobile_limit')) {
             throw new UserException([
                 'msg' => '发送次数过多',

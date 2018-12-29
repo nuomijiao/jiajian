@@ -8,7 +8,7 @@
 
 namespace app\jjapi\model;
 
-class WhSmsCode extends BaseModel
+class WhSmscode extends BaseModel
 {
     public function setExpireTimeAttr($value, $data)
     {
