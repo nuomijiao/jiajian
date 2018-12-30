@@ -29,7 +29,6 @@ class Pay extends Controller
         return json([
             'a' => 2
         ]);
-
         // v($_POST);
         // var_dump($_FILES);exit;
         $postData = Request::instance()->post();
