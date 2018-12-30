@@ -36,3 +36,7 @@ Route::post('api/:version/register', 'jjapi/:version.LogAndReg/register');
 Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 //忘记密码
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
+
+
+
+Route::post('api/:version/auth', 'jjapi/:version.Pay/auth');
