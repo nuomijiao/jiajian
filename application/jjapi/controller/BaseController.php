@@ -17,7 +17,7 @@ class BaseController extends Controller
     {
         return json([
             'error_code'=>'Success',
-            'data'=> $param,
+            'data'=> $param
         ]);
     }
 }
