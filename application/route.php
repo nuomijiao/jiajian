@@ -38,5 +38,5 @@ Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
 
 
-
+// 签约/认证
 Route::post('api/:version/auth', 'jjapi/:version.Pay/auth');
