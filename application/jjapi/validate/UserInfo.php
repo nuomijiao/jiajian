@@ -12,7 +12,7 @@ namespace app\jjapi\validate;
 class UserInfo extends BaseValidate
 {
     protected $rule = [
-        'fullname' => 'require|chs',
+        'fullname' => 'require|chsDash',
         'email' => 'require|email',
     ];
 
