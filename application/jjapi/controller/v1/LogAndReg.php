@@ -12,6 +12,7 @@ namespace app\jjapi\controller\v1;
 use app\jjapi\controller\BaseController;
 use app\jjapi\model\WhSmscode;
 use app\jjapi\model\WhUser;
+use app\jjapi\service\Token;
 use app\jjapi\service\UserToken;
 use app\jjapi\validate\LoginTokenGet;
 use app\jjapi\validate\RegisterOrReset;
@@ -19,6 +20,8 @@ use app\lib\enum\SmsCodeTypeEnum;
 use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
 use app\lib\exception\UserException;
+use think\Cache;
+use think\Request;
 
 class LogAndReg extends BaseController
 {
@@ -136,6 +139,18 @@ class LogAndReg extends BaseController
                 ]);
             }
         }
+    }
+
+    public function logout()
+    {
+        $token = Request::instance()->header('token');
+        $vars = Cache::get($token);
+        if ($vars) {
+            cache($token, NULL);
+        }
+        throw new SuccessMessage([
+            'msg' => '退出成功',
+        ]);
     }
 
 

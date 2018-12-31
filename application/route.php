@@ -36,6 +36,9 @@ Route::post('api/:version/register', 'jjapi/:version.LogAndReg/register');
 Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 //忘记密码
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
+//退出登录
+Route::post('api/:version/logout', 'jjapi/:version.LogAndReg/logout');
+
 
 //获取banner
 Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
@@ -48,6 +51,16 @@ Route::post('api/:version/addshare', 'jjapi/:version.Share/addShare');
 Route::get('api/:version/getsharelist/:type', 'jjapi/:version.Share/getShareList');
 //获取共享详情
 Route::get('api/:version/getsharedetail/:id', 'jjapi/:version.Share/getShareDetail');
+
+
+//获取用户信息
+Route::get('api/:version/getuserinfo', 'jjapi/:version.User/getUserInfo');
+//修改头像
+Route::post('api/:version/modifyheadimg', 'jjapi/version.User/modifyHeadImg');
+//修改信息
+Route::post('api/:version/saveinfo', 'jjapi/version.User/saveInfo');
+
+
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
