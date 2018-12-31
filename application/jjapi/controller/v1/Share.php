@@ -10,8 +10,12 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
+use app\jjapi\model\WhTempImgs;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
+use app\jjapi\validate\ShareNew;
+use app\jjapi\validate\TypeMustBePositiveInt;
+use app\lib\enum\ShareTypeEnum;
 
 class Share extends BaseController
 {
@@ -29,5 +33,17 @@ class Share extends BaseController
             'user_id' => $uid,
         ]);
         return $this->xdreturn($img);
+    }
+
+    //上传分享内容。客户或产品
+    public function addShare($type = ShareTypeEnum::Product)
+    {
+        (new TypeMustBePositiveInt())->goCheck();
+        $request = (new ShareNew())->goCheck();
+        $title = $request->param('title');
+        $content = $request->param('content');
+        $ids = $request->param('ids');
+
+        $uid = Token::getCurrentUid();
     }
 }
