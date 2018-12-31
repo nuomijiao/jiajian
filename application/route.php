@@ -42,8 +42,8 @@ Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
-Route::get('api/:version/getcitybyprovince', 'jjapi/:version.Character/getCityByProvince');
-Route::get('api/:version/getdistrictbycity', 'jjapi/:version.Character/getDistrictByCity');
+Route::get('api/:version/getcitybyprovince/:id', 'jjapi/:version.City/getCityByProvince');
+Route::get('api/:version/getdistrictbycity/:id', 'jjapi/:version.City/getDistrictByCity');
 
 
 // 签约/认证
