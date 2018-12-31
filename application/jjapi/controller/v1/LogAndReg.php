@@ -16,6 +16,7 @@ use app\jjapi\service\UserToken;
 use app\jjapi\validate\LoginTokenGet;
 use app\jjapi\validate\RegisterOrReset;
 use app\lib\enum\SmsCodeTypeEnum;
+use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
 use app\lib\exception\UserException;
 
@@ -58,7 +59,7 @@ class LogAndReg extends BaseController
             //新增用户数据库
             $dataArray = [
                 'mobile' => $mobile, 'pwd' => md5(md5($pwd)),
-                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png',
+                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png', 'degree' => UserDegreeEnum::YouKe
             ];
             $user = WhUser::create($dataArray);
             if ($user) {
