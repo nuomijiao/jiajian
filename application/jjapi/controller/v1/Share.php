@@ -16,6 +16,7 @@ use app\jjapi\service\Token;
 use app\jjapi\validate\ShareNew;
 use app\jjapi\validate\TypeMustBePositiveInt;
 use app\lib\enum\ShareTypeEnum;
+use app\jjapi\service\Share as ShareService;
 
 class Share extends BaseController
 {
@@ -45,5 +46,7 @@ class Share extends BaseController
         $ids = $request->param('ids');
 
         $uid = Token::getCurrentUid();
+        $data = ShareService::releaseShare($uid,$title,$content,$ids,$type);
+        return $this->jjreturn($data);
     }
 }
