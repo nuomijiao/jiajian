@@ -33,7 +33,7 @@ class Share extends BaseController
             'img_name' => $data['filename'],
             'user_id' => $uid,
         ]);
-        return $this->xdreturn($img);
+        return $this->jjreturn($img);
     }
 
     //上传分享内容。客户或产品
