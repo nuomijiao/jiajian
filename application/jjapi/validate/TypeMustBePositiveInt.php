@@ -12,7 +12,7 @@ namespace app\jjapi\validate;
 class TypeMustBePositiveInt extends BaseValidate
 {
     protected $rule = [
-        'type' => 'require|isPositiveInteger',
+        'type' => 'require|in:1,2,3,4',
     ];
 
     protected $message = [
