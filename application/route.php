@@ -37,6 +37,9 @@ Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 //忘记密码
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
 
+//获取banner
+Route::get('api/:version/getbanner', 'jjapi/:version.Banner/getBanner');
+
 
 // 签约/认证
 Route::post('api/:version/auth', 'jjapi/:version.Pay/auth');
