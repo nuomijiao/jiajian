@@ -75,7 +75,7 @@ class Share extends BaseController
     public function getShareDetail($id)
     {
         (new IDMustBePositiveInt())->goCheck();
-        $shareDetail = WhShare::get($id);
+        $shareDetail = WhShare::getShareDetail($id);
         if (!$shareDetail) {
             throw new ShareException();
         }

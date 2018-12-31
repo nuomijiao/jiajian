@@ -32,4 +32,9 @@ class WhShare extends BaseModel
         ])->where('type', '=', $type)->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
     }
 
+    public static function getShareDetail($id)
+    {
+        return self::with(['allImg'])->where('id', '=', $id)->find();
+    }
+
 }
