@@ -29,12 +29,12 @@ class WhShare extends BaseModel
             'user' => function($query) {
                 $query->field(['id', 'fullname', 'head_img']);
             }
-        ])->where('type', '=', $type)->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
+        ])->where('type', '=', $type)->where('is_show', '=', 1)->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
     }
 
     public static function getShareDetail($id)
     {
-        return self::with(['allImg'])->where('id', '=', $id)->find();
+        return self::with(['allImg'])->where('id', '=', $id)->where('is_show', '=', 1)->find();
     }
 
 }
