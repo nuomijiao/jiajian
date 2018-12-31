@@ -38,7 +38,7 @@ Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
 
 //获取banner
-Route::get('api/:version/getbanner', 'jjapi/:version.Banner/getBanner');
+Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
 
 
 // 签约/认证

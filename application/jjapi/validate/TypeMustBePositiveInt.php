@@ -16,6 +16,6 @@ class TypeMustBePositiveInt extends BaseValidate
     ];
 
     protected $message = [
-        'type' => 'type类型必须是正整数',
+
     ];
 }
