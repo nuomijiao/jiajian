@@ -56,9 +56,9 @@ Route::get('api/:version/getsharedetail/:id', 'jjapi/:version.Share/getShareDeta
 //获取用户信息
 Route::get('api/:version/getuserinfo', 'jjapi/:version.User/getUserInfo');
 //修改头像
-Route::post('api/:version/modifyheadimg', 'jjapi/version.User/modifyHeadImg');
+Route::post('api/:version/modifyheadimg', 'jjapi/:version.User/modifyHeadImg');
 //修改信息
-Route::post('api/:version/saveinfo', 'jjapi/version.User/saveInfo');
+Route::post('api/:version/saveinfo', 'jjapi/:version.User/saveInfo');
 
 
 
