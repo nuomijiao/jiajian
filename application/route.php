@@ -40,6 +40,11 @@ Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
 //获取banner
 Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
 
+//获取省市区
+Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
+Route::get('api/:version/getcitybyprovince', 'jjapi/:version.Character/getCityByProvince');
+Route::get('api/:version/getdistrictbycity', 'jjapi/:version.Character/getDistrictByCity');
+
 
 // 签约/认证
 Route::post('api/:version/auth', 'jjapi/:version.Pay/auth');
