@@ -22,7 +22,7 @@ class User extends BaseController
     public function getUserInfo()
     {
         $uid = Token::getCurrentUid();
-        $userInfo = WhUser::get($uid);
+        $userInfo = WhUser::get($uid)->hidden(['pwd']);
         if (!$userInfo) {
             throw new UserException();
         }
