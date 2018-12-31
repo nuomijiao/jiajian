@@ -10,13 +10,16 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
+use app\jjapi\model\WhShare;
 use app\jjapi\model\WhTempImgs;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
+use app\jjapi\validate\IDMustBePositiveInt;
 use app\jjapi\validate\ShareNew;
 use app\jjapi\validate\TypeMustBePositiveInt;
 use app\lib\enum\ShareTypeEnum;
 use app\jjapi\service\Share as ShareService;
+use app\lib\exception\ShareException;
 
 class Share extends BaseController
 {
@@ -48,5 +51,34 @@ class Share extends BaseController
         $uid = Token::getCurrentUid();
         $data = ShareService::releaseShare($uid,$title,$content,$ids,$type);
         return $this->jjreturn($data);
+    }
+
+    public function getShareList($type = ShareTypeEnum::Product, $page = 1, $size = 10)
+    {
+        (new TypeMustBePositiveInt())->goCheck();
+        $pagingShareList = WhShare::getShareList($type, $page, $size);
+        if ($pagingShareList->isEmpty()) {
+            throw new ShareException([
+                'msg' => '共享信息已见底线',
+                'errorCode' => 60001,
+            ]);
+        }
+        $data = $pagingShareList->toArray();
+        return json([
+            'error_code' => 'Success',
+            'data' => $data,
+            'current_page' => $pagingShareList->getCurrentPage(),
+        ]);
+
+    }
+
+    public function getShareDetail($id)
+    {
+        (new IDMustBePositiveInt())->goCheck();
+        $shareDetail = WhShare::get($id);
+        if (!$shareDetail) {
+            throw new ShareException();
+        }
+        return $this->jjreturn($shareDetail);
     }
 }

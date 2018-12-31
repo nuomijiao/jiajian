@@ -44,6 +44,10 @@ Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
 Route::post('api/:version/addshareimg', 'jjapi/:version.Share/addShareImg');
 //共享上传内容
 Route::post('api/:version/addshare', 'jjapi/:version.Share/addShare');
+//获取共享列表
+Route::get('api/:version/getsharelist/:type', 'jjapi/:version.Share/getShareList');
+//获取共享详情
+Route::post('api/:version/getsharedetail/:id', 'jjapi/:version.Share/getShareDetail');
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
