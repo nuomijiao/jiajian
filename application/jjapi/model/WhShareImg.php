@@ -11,5 +11,8 @@ namespace app\jjapi\model;
 
 class WhShareImg extends BaseModel
 {
-
+    public function getUrlAttr($value)
+    {
+        return config('setting.domain').$value;
+    }
 }
