@@ -153,6 +153,15 @@ class LogAndReg extends BaseController
         ]);
     }
 
+    //判断是否登录
+    public function isLogin()
+    {
+        $uid = Token::getCurrentUid();
+        throw new SuccessMessage([
+            'msg' => '已登录',
+        ]);
+    }
+
 
     private static function randIdNumber()
     {

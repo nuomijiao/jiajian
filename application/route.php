@@ -38,7 +38,8 @@ Route::post('api/:version/login', 'jjapi/:version.LogAndReg/login');
 Route::post('api/:version/resetpwd', 'jjapi/:version.LogAndReg/resetPwd');
 //退出登录
 Route::post('api/:version/logout', 'jjapi/:version.LogAndReg/logout');
-
+//判断是否登录
+Route::get('api/:version/islogin', 'jjapi/:version.LogAndReg/isLogin');
 
 //获取banner
 Route::get('api/:version/getbanner/:type', 'jjapi/:version.Banner/getBanner');
