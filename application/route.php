@@ -64,9 +64,9 @@ Route::post('api/:version/saveinfo', 'jjapi/:version.User/saveInfo');
 //申请精英上传图片
 Route::post('api/:version/addeliteimg', 'jjapi/:version.Elite/addImg');
 //申请精英上传数据
-Route::post('api/:version/adelite', 'jjapi/:version.Elite/addElite');
-
-
+Route::post('api/:version/addelite', 'jjapi/:version.Elite/addElite');
+//申请加盟商
+Route::post('api/:version/addapply', 'jjapi/:version.AccountApply/addApply');
 
 
 //获取省市区
