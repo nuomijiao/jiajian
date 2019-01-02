@@ -30,6 +30,6 @@ class AccountNew extends BaseValidate
         'district_id' => '区id必须为正整数',
         'address' => '详细地址不能为空',
         'alliance_id_number' => '加盟商识别码必须为字母和数字',
-        'type' => 'require|in:1,2',
+        'type' => 'type在1和2之间',
     ];
 }
