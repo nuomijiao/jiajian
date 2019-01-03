@@ -43,12 +43,12 @@ class Elite extends BaseController
         if ($elite->status == AccountApplyStatusEnum::Wait) {
             throw new OpenAccountException([
                 'msg' => '已申请精英版，请等待审核',
-                'errorCode' => 70001,
+                'errorCode' => 70000,
             ]);
         } elseif ($elite->status == AccountApplyStatusEnum::Pass) {
             throw new OpenAccountException([
                 'msg' => '已申请精英版，通过审核，请勿重复申请',
-                'errorCode' => 70002,
+                'errorCode' => 70000,
             ]);
         }
         $request = $validate->goCheck();
