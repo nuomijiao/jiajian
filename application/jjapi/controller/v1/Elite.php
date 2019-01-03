@@ -40,12 +40,12 @@ class Elite extends BaseController
         $validate = new EliteNew();
         $uid = Token::getCurrentUid();
         $elite = WhEliteAccount::checkEliteExist($uid);
-        if ($elite->status == AccountApplyStatusEnum::Wait) {
+        if ($elite && $elite->status == AccountApplyStatusEnum::Wait) {
             throw new OpenAccountException([
                 'msg' => '已申请精英版，请等待审核',
                 'errorCode' => 70000,
             ]);
-        } elseif ($elite->status == AccountApplyStatusEnum::Pass) {
+        } elseif ($elite && $elite->status == AccountApplyStatusEnum::Pass) {
             throw new OpenAccountException([
                 'msg' => '已申请精英版，通过审核，请勿重复申请',
                 'errorCode' => 70000,

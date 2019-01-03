@@ -29,24 +29,24 @@ class AccountApply extends BaseController
         $type = $this->request->post('type');
         $apply = WhAccountApply::checkApplyExist($uid, $type);
         if ($type == AccountApplyTypeEnum::Company) {
-            if ($apply->status == AccountApplyStatusEnum::Wait) {
+            if ($apply && $apply->status == AccountApplyStatusEnum::Wait) {
                 throw new OpenAccountException([
                     'msg' => '已申请企业版，请等待审核',
                     'errorCode' => 70000,
                 ]);
-            } elseif ($apply->status == AccountApplyStatusEnum::Pass) {
+            } elseif ($apply && $apply->status == AccountApplyStatusEnum::Pass) {
                 throw new OpenAccountException([
                     'msg' => '已申请企业版，通过审核，请勿重复申请',
                     'errorCode' => 70000,
                 ]);
             }
         } elseif ($type == AccountApplyTypeEnum::Alliance) {
-            if ($apply->status == AccountApplyStatusEnum::Wait) {
+            if ($apply && $apply->status == AccountApplyStatusEnum::Wait) {
                 throw new OpenAccountException([
                     'msg' => '已申请加盟商版，请等待审核',
                     'errorCode' => 70000,
                 ]);
-            } elseif ($apply->status == AccountApplyStatusEnum::Pass) {
+            } elseif ($apply && $apply->status == AccountApplyStatusEnum::Pass) {
                 throw new OpenAccountException([
                     'msg' => '已申请加盟商版，通过审核，请勿重复申请',
                     'errorCode' => 70000,
