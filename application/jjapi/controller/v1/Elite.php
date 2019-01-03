@@ -17,6 +17,7 @@ use app\jjapi\service\Token;
 use app\jjapi\validate\EliteNew;
 use app\lib\enum\AccountApplyStatusEnum;
 use app\lib\enum\RoleEnum;
+use app\lib\exception\OpenAccountException;
 use app\lib\exception\SuccessMessage;
 
 class Elite extends BaseController
@@ -37,9 +38,22 @@ class Elite extends BaseController
     public function addElite()
     {
         $validate = new EliteNew();
+        $uid = Token::getCurrentUid();
+        $elite = WhEliteAccount::checkEliteExist($uid);
+        if ($elite->status == AccountApplyStatusEnum::Wait) {
+            throw new OpenAccountException([
+                'msg' => '已申请精英版，请等待审核',
+                'errorCode' => 70001,
+            ]);
+        } elseif ($elite->status == AccountApplyStatusEnum::Pass) {
+            throw new OpenAccountException([
+                'msg' => '已申请精英版，通过审核，请勿重复申请',
+                'errorCode' => 70002,
+            ]);
+        }
         $request = $validate->goCheck();
         $dataArray = $validate->getDataByRule($request->post());
-        $uid = Token::getCurrentUid();
+
         $dataArray['user_id'] = $uid;
         if (!empty($dataArray['company_id_number'])) {
             $dataArray['company_id'] = Admin::where(['id_code' => $dataArray['company_id_number'], 'role_id' => RoleEnum::Company])->value('id');

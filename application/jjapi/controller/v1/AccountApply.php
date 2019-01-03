@@ -17,6 +17,7 @@ use app\jjapi\validate\AccountNew;
 use app\lib\enum\AccountApplyStatusEnum;
 use app\lib\enum\AccountApplyTypeEnum;
 use app\lib\enum\RoleEnum;
+use app\lib\exception\OpenAccountException;
 use app\lib\exception\SuccessMessage;
 
 class AccountApply extends BaseController
@@ -24,8 +25,35 @@ class AccountApply extends BaseController
     public function addApply($type = AccountApplyTypeEnum::Company)
     {
         $validate = new AccountNew();
-        $request = $validate->goCheck();
         $uid = Token::getCurrentUid();
+        $type = $this->request->post('type');
+        $apply = WhAccountApply::checkApplyExist($uid, $type);
+        if ($type == AccountApplyTypeEnum::Company) {
+            if ($apply->status == AccountApplyStatusEnum::Wait) {
+                throw new OpenAccountException([
+                    'msg' => '已申请企业版，请等待审核',
+                    'errorCode' => 70003,
+                ]);
+            } elseif ($apply->status == AccountApplyStatusEnum::Pass) {
+                throw new OpenAccountException([
+                    'msg' => '已申请企业版，通过审核，请勿重复申请',
+                    'errorCode' => 70004,
+                ]);
+            }
+        } elseif ($type == AccountApplyTypeEnum::Alliance) {
+            if ($apply->status == AccountApplyStatusEnum::Wait) {
+                throw new OpenAccountException([
+                    'msg' => '已申请加盟商版，请等待审核',
+                    'errorCode' => 70005,
+                ]);
+            } elseif ($apply->status == AccountApplyStatusEnum::Pass) {
+                throw new OpenAccountException([
+                    'msg' => '已申请加盟商版，通过审核，请勿重复申请',
+                    'errorCode' => 70006,
+                ]);
+            }
+        }
+        $request = $validate->goCheck();
         $dataArray = $validate->getDataByRule($request->post());
         $dataArray['user_id'] = $uid;
         if (!empty($dataArray['alliance_id_number'])) {
