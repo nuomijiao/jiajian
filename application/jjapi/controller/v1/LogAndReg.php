@@ -65,10 +65,10 @@ class LogAndReg extends BaseController
                 'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png', 'degree' => UserDegreeEnum::YouKe
             ];
             $user = WhUser::create($dataArray);
-            if ($user) {
-                throw new SuccessMessage([
-                    'msg' => '注册成功',
-                ]);
+            if ($user->id) {
+                $reg = new UserToken();
+                $token = $reg->getToken($user->id);
+                return $this->jjreturn(['token'=>$token]);
             }
         }
     }
