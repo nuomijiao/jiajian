@@ -57,6 +57,12 @@ class Elite extends BaseController
         $dataArray['user_id'] = $uid;
         if (!empty($dataArray['company_id_number'])) {
             $dataArray['company_id'] = Admin::where(['id_code' => $dataArray['company_id_number'], 'role_id' => RoleEnum::Company])->value('id');
+            if (!$dataArray['company_id']) {
+                throw new OpenAccountException([
+                    'msg' => '企业识别码有误',
+                    'errorCode' => 70007,
+                ]);
+            }
         }
         $dataArray['status'] = AccountApplyStatusEnum::Wait;
         WhEliteAccount::create($dataArray);
