@@ -20,12 +20,12 @@ $payConfig = [
 
     'dev_syn_url'   =>  'http://218.4.234.150:9600 /realnameAuth.action',           // 同步支付 测试地址
     'syn_url'       =>  'https://fastpay.95epay.cn/pay/realnameAuth.action',        // 同步支付 生产地址
-    'notify_url'    => 'https://jiajian.wh66.cn/jjapi/pay/notify',                  // 异步支付通知地址
+    'notify_url'    => 'http://www.skeep.cc/jjapi/v1/pay/trans_notify',             // 异步支付通知地址
 
-    'dev_trans_url' => 'http://218.4.234.150:9600/ hfDaikouTrade.action',           // 交易接口 测试地址
+    'dev_trans_url' => 'http://218.4.234.150:9600/hfDaikouTrade.action',            // 交易接口 测试地址
     'trans_url'     => 'https://fastpay.95epay.cn/pay/hfDaikouTrade.action',        // 交易接口 生产地址
 
-    'break_bind_pay_url' => 'https://fastpay.95epay.cn/pay/breakBindCard.action',   // 解约接口 测试地址
+    'break_bind_pay_url' => 'https://fastpay.95epay.cn/pay/breakBindCard.action',       // 解约接口 测试地址
     'dev_break_bind_pay_url' => 'https://fastpay.95epay.cn/pay/breakBindCard.action',   // 解约接口 生产地址
 ];
 
