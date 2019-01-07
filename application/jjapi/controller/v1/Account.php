@@ -73,16 +73,16 @@ class Account extends Base{
         $status = Request::instance()->param('status', 1);
 
         // 显示记录数
-        $size = Request::instance()->post('size', 10);
+        $size = Request::instance()->param('size', 10);
 
         // 页码
-        $pageSize = Request::instance()->post('pageSize', 1);
+        $pageSize = Request::instance()->param('pageSize', 1);
         $pageSize = (int)$pageSize - 1;
 
         // 总页数
         $num = Db::name('wh_contract')
             ->where([
-                'uid'    => $this->uid,
+                'uid'    => 5,
                 'status' => $status
             ])
             ->count();
@@ -90,10 +90,10 @@ class Account extends Base{
         // 单页条数
         $data = Db::name('wh_contract')
             ->where([
-                'uid'    => $this->uid,
+                'uid'    => 5,
                 'status' => $status
             ])
-            ->limit($pageSize, $size)
+            ->limit($pageSize * $size, $size)
             ->select();
 
         return json([

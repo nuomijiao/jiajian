@@ -45,7 +45,7 @@ class Pay extends Base
             ->where([
                 'status' => 1
             ])
-            ->limit($pageSize, $size)
+            ->limit($pageSize * $size, $size)
             ->select();
 
         return json([
@@ -640,7 +640,7 @@ class Pay extends Base
                 'type'   => $type,
                 'status' => $status,
             ])
-            ->limit($pageSize, $size)
+            ->limit($pageSize * $size, $size)
             ->select();
 
         return json([

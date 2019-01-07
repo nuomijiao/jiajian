@@ -101,7 +101,7 @@ class Risk extends Base
                 'uid'    => $this->uid,
                 'status' => $status
             ])
-            ->limit($pageSize, $size)
+            ->limit($pageSize * $size, $size)
             ->select();
 
         return json([
