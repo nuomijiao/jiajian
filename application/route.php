@@ -73,7 +73,3 @@ Route::post('api/:version/addapply', 'jjapi/:version.AccountApply/addApply');
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
 Route::get('api/:version/getcitybyprovince/:id', 'jjapi/:version.City/getCityByProvince');
 Route::get('api/:version/getdistrictbycity/:id', 'jjapi/:version.City/getDistrictByCity');
-
-
-// 签约/认证
-Route::post('api/:version/auth', 'jjapi/:version.Pay/auth');
