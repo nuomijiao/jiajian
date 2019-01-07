@@ -9,7 +9,6 @@
 namespace app\jjapi\model;
 
 
-use app\lib\enum\AccountApplyStatusEnum;
 
 class WhEliteAccount extends BaseModel
 {
