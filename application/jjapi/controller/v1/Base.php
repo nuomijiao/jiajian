@@ -20,7 +20,7 @@ use app\lib\exception\UserException;
 class Base extends Controller
 {
     /**
-     * 过滤器
+     * 基础过滤器
      */
     public function _initialize()
     {
