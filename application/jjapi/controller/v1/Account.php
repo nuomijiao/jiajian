@@ -82,7 +82,7 @@ class Account extends Base{
         // 总页数
         $num = Db::name('wh_contract')
             ->where([
-                'uid'    => 5,
+                'uid'    => $this->uid,
                 'status' => $status
             ])
             ->count();
@@ -90,7 +90,7 @@ class Account extends Base{
         // 单页条数
         $data = Db::name('wh_contract')
             ->where([
-                'uid'    => 5,
+                'uid'    => $this->uid,
                 'status' => $status
             ])
             ->limit($pageSize * $size, $size)

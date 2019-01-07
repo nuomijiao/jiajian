@@ -31,12 +31,12 @@ class Base extends Controller
         }
         else
         {
-            // echo json_encode([
-            //     'errcode' => 201,
-            //     'errmsg'  => 'illegal request',
-            // ]);
+            echo json_encode([
+                'errcode' => 201,
+                'errmsg'  => 'illegal request',
+            ]);
 
-            // die();
+            die();
         }
     }
 
