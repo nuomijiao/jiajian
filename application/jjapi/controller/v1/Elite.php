@@ -11,6 +11,7 @@ namespace app\jjapi\controller\v1;
 
 use app\jjapi\controller\BaseController;
 use app\jjapi\model\Admin;
+use app\jjapi\model\WhAccountApply;
 use app\jjapi\model\WhEliteAccount;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
@@ -39,6 +40,14 @@ class Elite extends BaseController
     {
         $validate = new EliteNew();
         $uid = Token::getCurrentUid();
+        //检查有没有申请企业和加盟商
+        $apply = WhAccountApply::checkApplyExist($uid);
+        if ($apply && $apply->status == AccountApplyStatusEnum::Pass) {
+            throw new OpenAccountException([
+                'msg' => '已申请过企业或加盟商版通过审核，不能再申请精英版',
+                'errorCode' => 70000,
+            ]);
+        }
         $elite = WhEliteAccount::checkEliteExist($uid);
         if ($elite && $elite->status == AccountApplyStatusEnum::Wait) {
             throw new OpenAccountException([
