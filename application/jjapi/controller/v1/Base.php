@@ -24,8 +24,18 @@ class Base extends Controller
      */
     public function _initialize()
     {
-        // $this->uid = 1;
-        $this->uid = Token::getCurrentUid();
+        if (Request::instance()->isPost())
+        {
+            // $this->uid = 1;
+            $this->uid = Token::getCurrentUid();
+        }
+        else
+        {
+            return json([
+                'errcode' => 201,
+                'errmsg'  => 'illegal request',
+            ]);
+        }
     }
 
 }
