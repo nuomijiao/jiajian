@@ -98,58 +98,61 @@ function curlPost($url, $data = '', $dataType = '')
     return $result;
 }
 
-/** 
- * encrypt
- * @param string 			[Y]	解密字符串
- * @param operation 		[Y]	加密解密关键字
- * @param key				[Y]	加密解密令牌
+/**
+ * 无限级节点归类(替代递归)
+ * @param list 		    [Y]	归类数组
+ * @param id 			[N]	子级key，默认id
+ * @param pid 			[N]	父级key，默认pid
+ * @param child 		[N]	子级归类后的key，默认child
+ * @param root 		    [N]	顶级
  */
-function encrypt($string, $operation, $key)
-{ 
-    $key = md5($key); 
-    $key_length = strlen($key); 
-    $string = $operation == 'D' ? base64_decode($string) : substr(md5($string.$key), 0, 8) . $string; 
-    $string_length = strlen($string); 
-    $rndkey = $box = array(); 
-    $result = '';
+function tree($list, $pk = 'id', $pid = 'pid', $child = 'child', $root = 0)
+{  
+    $tree = [];
 
-    for($i = 0; $i <= 255; $i++)
-    { 
-        $rndkey[$i] = ord($key[$i % $key_length]); 
-        $box[$i] = $i; 
-    } 
+    if(is_array($list)) 
+    {  
+        $refer = [];
 
-    for($j = $i = 0; $i < 256; $i++)
-    { 
-        $j = ($j + $box[$i] + $rndkey[$i]) % 256; 
-        $tmp = $box[$i]; 
-        $box[$i] = $box[$j]; 
-        $box[$j] = $tmp; 
-    } 
-
-    for($a = $j = $i = 0; $i < $string_length; $i++)
-    { 
-        $a = ($a+1) % 256; 
-        $j = ($j+$box[$a]) % 256; 
-        $tmp = $box[$a]; 
-        $box[$a] = $box[$j]; 
-        $box[$j] = $tmp; 
-        $result .= chr(ord($string[$i])^($box[($box[$a] + $box[$j]) % 256])); 
-    } 
-
-    if($operation == 'D')
-    { 
-        if(substr($result,0,8) == substr(md5(substr($result,8).$key), 0, 8))
-        { 
-            return substr($result, 8); 
+        //基于数组的指针(引用) 并 同步改变数组
+        foreach ($list as $key => $val) 
+        {  
+            $refer[$val[$pk]] = &$list[$key];
         }
-        else
-        { 
-            return ''; 
+
+        foreach ($list as $key => $val)
+        {  
+            //判断是否存在parent  
+            $parentId = $val[$pid];
+
+            if ($root == $parentId) 
+            {  
+                $tree[$val[$pk]] = &$list[$key]; 
+            }
+            else
+            {  
+                if (isset($refer[$parentId]))
+                {  
+                    $refer[$parentId][$child][] = &$list[$key];  
+                }  
+            }
         } 
     }
-    else
-    { 
-        return str_replace('=', '', base64_encode($result)); 
-    } 
+
+    return $tree;  
+}
+
+/**
+ * 驼峰命名转下划线命名
+ * @param $str  字符串
+ */
+function toUnderScore($str)
+{
+    $dstr = preg_replace_callback('/([A-Z]+)/',function($matchs)
+    {
+        return '_'.strtolower($matchs[0]);
+
+    },$str);
+
+    return trim(preg_replace('/_{2,}/','_', $dstr), '_');
 }
