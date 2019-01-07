@@ -34,14 +34,14 @@ class Pay extends Base
         $pageSize = (int)$pageSize - 1;
 
         // 总记录数
-        $num = Db::name('auth')
+        $num = Db::name('wh_auth')
             ->where([
                 'status' => 1
             ])
             ->count();
 
         // 单页条数
-        $data = Db::name('auth')
+        $data = Db::name('wh_auth')
             ->where([
                 'status' => 1
             ])
@@ -355,7 +355,7 @@ class Pay extends Base
 
         if(isset($data['params']['sid']))
         {
-            Db::name('auth')
+            Db::name('wh_auth')
                 ->where([
                     'sid' => $data['params']['sid'],
                 ])
@@ -414,7 +414,7 @@ class Pay extends Base
         $price = Request::instance()->param('price');
 
         // 验证是否签约
-        $result = Db::name('auth')
+        $result = Db::name('wh_auth')
                 ->where([
                     'phone' => $phone,
                     'status'=> 1        // 1为签约成功 2为失败
@@ -478,7 +478,7 @@ class Pay extends Base
 
 
         // 所属企业ID
-        $eData = Db::name('user')
+        $eData = Db::name('wh_user')
                 ->where([
                     'id' => $this->uid
                 ])
@@ -487,7 +487,7 @@ class Pay extends Base
         $company_id = empty($eData) ? -1 : $eData['company_id'];
 
         // 交易订单入库
-        $bool = Db::name('pay_order')->insert([
+        $bool = Db::name('wh_pay_order')->insert([
             'uid'       => $this->uid,
             'type'      => $type,
             'cust_name' => $postData['custName'],
@@ -526,7 +526,7 @@ class Pay extends Base
         $txnTime    = Request::instance()->param('txnTime');
         $smsCode    = Request::instance()->param('smsCode');
 
-        $result = Db::name('pay_order')
+        $result = Db::name('wh_pay_order')
                 ->where([
                     'order_no' => $merOrderNo,
                 ])
@@ -596,7 +596,7 @@ class Pay extends Base
 
         if(isset($postData['BillNo']))
         {
-            $bool = Db::name('pay_order')
+            $bool = Db::name('wh_pay_order')
                 ->where([
                     'order_no' => $postData['BillNo'],
                 ])
@@ -625,7 +625,7 @@ class Pay extends Base
         $pageSize = (int)$pageSize - 1;
 
         // 总记录数
-        $num = Db::name('pay_order')
+        $num = Db::name('wh_pay_order')
             ->where([
                 'uid'    => $this->uid,
                 'type'   => $type,
@@ -634,7 +634,7 @@ class Pay extends Base
             ->count();
 
         // 单页条数
-        $data = Db::name('pay_order')
+        $data = Db::name('wh_pay_order')
             ->where([
                 'uid'    => $this->uid,
                 'type'   => $type,

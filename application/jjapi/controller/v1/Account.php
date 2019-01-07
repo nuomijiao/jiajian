@@ -32,7 +32,7 @@ class Account extends Base{
         }
 
         // 所属企业ID
-        $eData = Db::name('user')
+        $eData = Db::name('wh_user')
                 ->where([
                     'id' => $this->uid
                 ])
@@ -44,7 +44,7 @@ class Account extends Base{
         $postData['uid'] = $this->uid;
         $postData['company_id'] = $company_id;
 
-        $bool = Db::name('contract')->insert($postData);
+        $bool = Db::name('wh_contract')->insert($postData);
 
         if($bool)
         {
@@ -80,7 +80,7 @@ class Account extends Base{
         $pageSize = (int)$pageSize - 1;
 
         // 总页数
-        $num = Db::name('contract')
+        $num = Db::name('wh_contract')
             ->where([
                 'uid'    => $this->uid,
                 'status' => $status
@@ -88,7 +88,7 @@ class Account extends Base{
             ->count();
 
         // 单页条数
-        $data = Db::name('contract')
+        $data = Db::name('wh_contract')
             ->where([
                 'uid'    => $this->uid,
                 'status' => $status
@@ -120,7 +120,7 @@ class Account extends Base{
     //         'createtime'=> time(),
     //     ];
 
-    //     $bool = Db::name('enterprise')->insert($data);
+    //     $bool = Db::name('wh_enterprise')->insert($data);
 
     //     if($bool)
     //     {
@@ -168,7 +168,7 @@ class Account extends Base{
 
     //     ];
 
-    //     $bool = Db::name('fine')->insert($data);
+    //     $bool = Db::name('wh_fine')->insert($data);
 
     //     if($bool)
     //     {

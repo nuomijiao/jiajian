@@ -83,7 +83,7 @@ class Content extends Controller{
             'paths'     => $paths,
         ];
 
-        $bool = Db::name('content')
+        $bool = Db::name('wh_content')
                 ->where('id', @$postData['id'])
                 ->update($data);
 

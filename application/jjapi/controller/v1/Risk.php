@@ -45,7 +45,7 @@ class Risk extends Base
         $json = $this->getMoZhangContent($postData['name'], $postData['idcard'], $postData['mobile'], $postData['method']);
 
         // 所属企业ID
-        $eData = Db::name('user')
+        $eData = Db::name('wh_user')
                 ->where([
                     'id' => $this->uid
                 ])
@@ -54,7 +54,7 @@ class Risk extends Base
         $company_id = empty($eData) ? -1 : $eData['company_id'];
 
         // 写入查询记录
-        Db::name('bigdata_order')->insert([
+        Db::name('wh_bigdata_order')->insert([
             'uid'    => $this->uid,
             'name'   => $postData['name'],
             'idcard' => $postData['idcard'],
@@ -88,7 +88,7 @@ class Risk extends Base
         $pageSize = (int)$pageSize - 1;
 
         // 总记录数
-        $num = Db::name('bigdata_order')
+        $num = Db::name('wh_bigdata_order')
             ->where([
                 'uid'    => $this->uid,
                 'status' => $status
@@ -96,7 +96,7 @@ class Risk extends Base
             ->count();
 
         // 单页条数
-        $data = Db::name('bigdata_order')
+        $data = Db::name('wh_bigdata_order')
             ->where([
                 'uid'    => $this->uid,
                 'status' => $status
