@@ -15,6 +15,12 @@ class WhAccountApply extends BaseModel
 
     public static function checkApplyExist($uid, $type)
     {
+        $where = [
+            'user_id' => $uid,
+        ];
+        if ($type) {
+            $where['type'] = $type;
+        }
         return self::where(['user_id'=>$uid, 'type'=>$type])->order('id', 'desc')->limit(1)->find();
     }
 }

@@ -12,6 +12,7 @@ namespace app\jjapi\controller\v1;
 use app\jjapi\controller\BaseController;
 use app\jjapi\model\Admin;
 use app\jjapi\model\WhAccountApply;
+use app\jjapi\model\WhEliteAccount;
 use app\jjapi\service\Token;
 use app\jjapi\validate\AccountNew;
 use app\lib\enum\AccountApplyStatusEnum;
@@ -27,6 +28,14 @@ class AccountApply extends BaseController
         $validate = new AccountNew();
         $uid = Token::getCurrentUid();
         $type = $this->request->post('type');
+        //判断有没有申请精英版审核通过
+        $elite = WhEliteAccount::checkEliteExist($uid);
+        if ($elite && $elite->status == AccountApplyStatusEnum::Pass) {
+            throw new OpenAccountException([
+                'msg' => '已申请精英版审核通过，不能再申请其他',
+                'errorCode' => 70000,
+            ]);
+        }
         $apply = WhAccountApply::checkApplyExist($uid, $type);
         if ($type == AccountApplyTypeEnum::Company) {
             if ($apply && $apply->status == AccountApplyStatusEnum::Wait) {

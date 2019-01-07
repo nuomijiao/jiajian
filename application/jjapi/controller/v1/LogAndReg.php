@@ -157,9 +157,12 @@ class LogAndReg extends BaseController
     public function isLogin()
     {
         $uid = Token::getCurrentUid();
-        throw new SuccessMessage([
-            'msg' => '已登录',
-        ]);
+        $degree = WhUser::where('id', '=', $uid)->value('degree');
+        $data = [
+            'islogin' => 1,
+            'degree' => $degree,
+        ];
+        return $this->jjreturn($data);
     }
 
 
