@@ -13,7 +13,7 @@ class WhAccountApply extends BaseModel
 {
     protected $autoWriteTimestamp = true;
 
-    public static function checkApplyExist($uid, $type)
+    public static function checkApplyExist($uid, $type = '')
     {
         $where = [
             'user_id' => $uid,
