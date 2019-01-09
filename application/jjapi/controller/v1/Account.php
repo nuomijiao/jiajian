@@ -21,7 +21,7 @@ class Account extends Base{
      */
     public function contract()
     {
-        $postData = Request::instance()->post();
+        $postData = Request::instance()->param();
 
         if(count($postData) !== 7)
         {
