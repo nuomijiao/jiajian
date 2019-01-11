@@ -47,9 +47,9 @@ class Share extends BaseController
         $title = $request->param('title');
         $content = $request->param('content');
         $ids = $request->param('ids');
-
+        $mobile = $request->param('mobile');
         $uid = Token::getCurrentUid();
-        $data = ShareService::releaseShare($uid,$title,$content,$ids,$type);
+        $data = ShareService::releaseShare($uid,$title,$content,$ids, $mobile, $type);
         return $this->jjreturn($data);
     }
 

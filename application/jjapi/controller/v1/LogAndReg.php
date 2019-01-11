@@ -10,12 +10,14 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
+use app\jjapi\model\Admin;
 use app\jjapi\model\WhSmscode;
 use app\jjapi\model\WhUser;
 use app\jjapi\service\Token;
 use app\jjapi\service\UserToken;
 use app\jjapi\validate\LoginTokenGet;
 use app\jjapi\validate\RegisterOrReset;
+use app\lib\enum\AccountApplyStatusEnum;
 use app\lib\enum\SmsCodeTypeEnum;
 use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
@@ -25,7 +27,7 @@ use think\Request;
 
 class LogAndReg extends BaseController
 {
-    public function register($mobile = '', $pwd = '', $pwd1 = '', $code = '')
+    public function register($mobile = '', $pwd = '', $pwd1 = '', $code = '', $company_code)
     {
         //注册流程
         //1. 判断手机号码是否已被注册
@@ -48,6 +50,7 @@ class LogAndReg extends BaseController
                 'errorCode' => 30001,
             ]);
         }
+
         //检查验证码是否正确
         $codeInfo = WhSmscode::checkCode($mobile, $code, SmsCodeTypeEnum::ToRegister);
         if (!$codeInfo || $codeInfo['validate_code'] != $code || $codeInfo['expire_time'] < time() || $codeInfo['using_time'] > 0) {
@@ -57,15 +60,36 @@ class LogAndReg extends BaseController
             ]);
         } else {
             $timenow = time();
+
+            $dataArray = [
+                'mobile' => $mobile, 'pwd' => md5(md5($pwd)),
+                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png'
+            ];
+
+            //检查企业识别码是否正确
+            if (!empty($company_code)) {
+                $company = Admin::getCompanyByCode($company_code);
+                if (!$company) {
+                    throw new UserException([
+                        'msg' => '填写的企业编码不存在',
+                        'errorCode' => 30007,
+                    ]);
+                }
+                $dataArray['company_code'] = $company_code;
+                $dataArray['degree'] = UserDegreeEnum::QiYe;
+                $dataArray['company'] = $company->nickname;
+                $dataArray['company_id'] = $company->id;
+                $dataArray['status'] = AccountApplyStatusEnum::Wait;
+            } else {
+                $dataArray['degree'] = UserDegreeEnum::YouKe;
+            }
+
             //修改验证码使用状态
             WhSmscode::changeStatus($mobile, $code, SmsCodeTypeEnum::ToRegister, $timenow);
             //新增用户数据库
-            $dataArray = [
-                'mobile' => $mobile, 'pwd' => md5(md5($pwd)),
-                'id_number' => self::randIdNumber(), 'head_img' => '/assets/img/user_head.png', 'degree' => UserDegreeEnum::YouKe
-            ];
+
             $user = WhUser::create($dataArray);
-            if ($user->id) {
+            if ($user->degree = UserDegreeEnum::YouKe) {
                 $reg = new UserToken();
                 $token = $reg->getToken($user->id);
                 return $this->jjreturn(['token'=>$token]);
@@ -157,10 +181,11 @@ class LogAndReg extends BaseController
     public function isLogin()
     {
         $uid = Token::getCurrentUid();
-        $degree = WhUser::where('id', '=', $uid)->value('degree');
+        $info = WhUser::where('id', '=', $uid)->field(['id', 'status', 'degree'])->find();
         $data = [
             'islogin' => 1,
-            'degree' => $degree,
+            'degree' => $info->degree,
+            'status' => $info->status,
         ];
         return $this->jjreturn($data);
     }

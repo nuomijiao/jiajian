@@ -35,4 +35,9 @@ class WhUser extends BaseModel
         $user = self::where('id_number', '=', $IdNumber)->find();
         return $user;
     }
+
+    public static function getUserDegree($uid)
+    {
+        return self::where('id', '=', $uid)->value('degree');
+    }
 }

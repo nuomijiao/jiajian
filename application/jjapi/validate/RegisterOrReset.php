@@ -16,6 +16,7 @@ class RegisterOrReset extends BaseValidate
         'pwd' => 'require|isNotEmpty',
         'pwd1' => 'require|isNotEmpty',
         'code' => 'require|isCode',
+        'company_code' => 'alphaNum',
     ];
 
     protected $message = [
@@ -23,6 +24,7 @@ class RegisterOrReset extends BaseValidate
         'pwd' => '密码不能为空',
         'pwd1' => '请确认密码',
         'code' => '验证码为6位数字',
+        'company_code' => '企业识别码必须为字母和数字'
     ];
 
     public function isCode($value)

@@ -15,14 +15,14 @@ class ShareNew extends BaseValidate
         'title' => 'require',
         'content' => 'require',
         'ids' => 'require|isIds',
-
+        'mobile' => 'require|isMobile'
     ];
 
     protected $message = [
         'title' => '标题不能为空',
         'content' => '内容不能为空',
         'ids' => 'ids格式有误',
-
+        'mobile' => '手机号码格式不正确',
     ];
 
     public function isIds($value)

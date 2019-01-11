@@ -29,7 +29,6 @@ class EliteNew extends BaseValidate
         'hand_card_img' => 'require',
         'zizhi_img' => 'require',
         'bank_card_img' => 'require',
-        'company_id_number' => 'alphaNum',
     ];
 
     protected $message = [
@@ -50,7 +49,6 @@ class EliteNew extends BaseValidate
         'hand_card_img' => '请上传手持身份证照片',
         'zizhi_img' => '请上传资质照片',
         'bank_card_img' => '请上传银行卡正面照片',
-        'company_id_number' => '企业识别码为字母和汉字',
     ];
 
 

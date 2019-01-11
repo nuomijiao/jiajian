@@ -17,7 +17,7 @@ use think\Exception;
 
 class Share
 {
-    public static function releaseShare($uid, $title, $content, $ids, $type) {
+    public static function releaseShare($uid, $title, $content, $ids, $mobile, $type) {
         //获取临时图片文件夹相关图片
         //更新到正式数据表
         //删除临时图片数据表数据
@@ -33,6 +33,7 @@ class Share
                 'content' => $content,
                 'type' => $type,
                 'user_id' => $uid,
+                'mobile' => $mobile,
             ]);
             $share_id = $share->id;
             foreach ($share_imgs as $key => $value) {
