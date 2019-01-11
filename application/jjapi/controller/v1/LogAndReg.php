@@ -79,6 +79,7 @@ class LogAndReg extends BaseController
                 $dataArray['degree'] = UserDegreeEnum::QiYe;
                 $dataArray['company'] = $company->nickname;
                 $dataArray['company_id'] = $company->id;
+                $dataArray['is_staff'] = 1;
                 $dataArray['status'] = AccountApplyStatusEnum::Wait;
             } else {
                 $dataArray['degree'] = UserDegreeEnum::YouKe;
@@ -186,6 +187,7 @@ class LogAndReg extends BaseController
             'islogin' => 1,
             'degree' => $info->degree,
             'status' => $info->status,
+            'is_staff' => $info->is_staff,
         ];
         return $this->jjreturn($data);
     }
