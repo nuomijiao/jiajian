@@ -182,7 +182,7 @@ class LogAndReg extends BaseController
     public function isLogin()
     {
         $uid = Token::getCurrentUid();
-        $info = WhUser::where('id', '=', $uid)->field(['id', 'status', 'degree'])->find();
+        $info = WhUser::where('id', '=', $uid)->field(['id', 'status', 'degree', 'is_staff'])->find();
         $data = [
             'islogin' => 1,
             'degree' => $info->degree,
