@@ -13,7 +13,7 @@ use app\lib\enum\RoleEnum;
 
 class Admin extends BaseModel
 {
-    public function getCompanyByCode($code)
+    public static function getCompanyByCode($code)
     {
         return self::where(['id_code'=>$code, 'role_id'=>RoleEnum::Company])->find();
     }
