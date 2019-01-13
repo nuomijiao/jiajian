@@ -90,7 +90,7 @@ class LogAndReg extends BaseController
             //新增用户数据库
 
             $user = WhUser::create($dataArray);
-            if ($user->degree = UserDegreeEnum::YouKe) {
+            if ($user) {
                 $reg = new UserToken();
                 $token = $reg->getToken($user->id);
                 return $this->jjreturn(['token'=>$token]);
