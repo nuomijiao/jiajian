@@ -79,13 +79,16 @@ class AccountApply extends BaseController
         $dataArray = $validate->getDataByRule($request->post());
         $dataArray['user_id'] = $uid;
         if (!empty($dataArray['alliance_id_number'])) {
-            $dataArray['alliance_id'] = Admin::where(['id_code' => $dataArray['alliance_id_number'], 'role_id' => RoleEnum::Alliance])->value('id');
-            if (!$dataArray['alliance_id']) {
+            $alliance = Admin::where(['id_code' => $dataArray['alliance_id_number'], 'role_id' => RoleEnum::Alliance])->find();
+            if (!$alliance) {
                 throw new OpenAccountException([
                     'msg' => '加盟商识别码有误',
                     'errorCode' => 70008,
                 ]);
             }
+            $dataArray['alliance_id'] = $alliance->id;
+            $dataArray['alliance_name'] = $alliance->nickname;
+
         }
         $dataArray['status'] = AccountApplyStatusEnum::Wait;
         $userData = ['id'=>$uid];
