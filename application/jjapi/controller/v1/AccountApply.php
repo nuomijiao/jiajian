@@ -91,7 +91,7 @@ class AccountApply extends BaseController
 
         }
         $dataArray['status'] = AccountApplyStatusEnum::Wait;
-        $userData = ['id'=>$uid];
+        $userData = ['id'=>$uid, 'is_main_user' => 1];
         if ($type == AccountApplyTypeEnum::Company) {
             $userData['degree'] = UserDegreeEnum::QiYe;
         } elseif ($type == AccountApplyTypeEnum::Alliance) {

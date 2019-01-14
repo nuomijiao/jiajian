@@ -97,6 +97,7 @@ class Elite extends BaseController
             WhUser::update([
                 'id' => $uid,
                 'degree' => UserDegreeEnum::JingYing,
+                'is_main_user' => 1,
             ]);
             Db::commit();
 
