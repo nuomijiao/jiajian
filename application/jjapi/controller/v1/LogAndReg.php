@@ -27,13 +27,9 @@ use think\Request;
 
 class LogAndReg extends BaseController
 {
-    public function register($mobile = '', $pwd = '', $pwd1 = '', $code = '', $company_code)
+    public function register($mobile = '', $pwd = '', $pwd1 = '', $code = '', $company_code = '')
     {
-        //注册流程
-        //1. 判断手机号码是否已被注册
-        //2.判断验证码是否正确
-        //3.账号密码加密新增数据库
-        //4.注册成功，即生成token返回给客户端，保存登陆状态
+
         (new RegisterOrReset())->goCheck();
         //检查两次密码是否一致
         if ($pwd !== $pwd1) {
