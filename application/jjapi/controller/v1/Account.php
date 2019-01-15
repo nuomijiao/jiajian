@@ -23,7 +23,7 @@ class Account extends Base{
     {
         $postData = Request::instance()->param();
 
-        if(count($postData) !== 7)
+        if(count($postData) !== 8)
         {
             return json([
                 'errcode' => 204,

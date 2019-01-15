@@ -167,7 +167,7 @@ class Pay extends Base
             ]);
 
             // 上上签电子合同签约
-            $result = $this->shangShangQian($postData['idNo'], $postData['phoneNo'], $postData['custName'], $sid);
+            $result = $this->shangShangQian($postData['idNo'],$postData['phoneNo'],$postData['custName'],$postData['cardNo'],$sid);
 
             if($result['errno'] != 0)
             {
@@ -181,10 +181,16 @@ class Pay extends Base
         return json($result);
     }
 
+    public function ceshi()
+    {
+        $a = $this->shangShangQian('411221198909105071', '18625221512', '先生', '12121', '455545545445');
+        var_dump($a);
+    }
+
     /**
      * 上上签 签约协议
      */
-    private function shangShangQian($idNo = '', $account = '', $name = '', $sid = '')
+    private function shangShangQian($idNo = '', $account = '', $name = '', $cardNo = '', $sid = '')
     {
         // $idNo = '343221199103201230';
         // $account = '15666589065';
@@ -261,21 +267,21 @@ class Pay extends Base
                     'x'      => '0.23',
                     'y'      => '0.65',
                     'type'   => 'text',
-                    'value'  => '3424564465465465465',
+                    'value'  => $idNo,
                 ],
                 [
                     'pageNum'=> '1',
                     'x'      => '0.23',
                     'y'      => '0.69',
                     'type'   => 'text',
-                    'value'  => '476579854156645',
+                    'value'  => $cardNo,
                 ],
                 [
                     'pageNum'=> '1',
                     'x'      => '0.23',
                     'y'      => '0.73',
                     'type'   => 'text',
-                    'value'  => '13285177015',
+                    'value'  => $account,
                 ],
                 [
                     'pageNum'=> '3',
@@ -300,8 +306,8 @@ class Pay extends Base
             'account'       => $account,
             'fid'           => $result['data']['fid'],
             'expireTime'    => "$time",
-            'title'         => '测试',
-            'description'   => '测试121212',
+            'title'         => '协议合同',
+            'description'   => '签署的协议合同',
         ]);
 
         $result = json_decode($response, true);
@@ -334,15 +340,66 @@ class Pay extends Base
         ]);
 
         $result = json_decode($response, true);
-        
-        // 此处为短信业务逻辑  $result['data']['url']
-        if($result['errno'] == 0)
+
+        var_dump($result);exit;
+
+        if($result['errno'] != 0)
         {
-            
+            return $result;
         }
 
-        // 返回结果数组
-        return $result;
+        // 短信发送
+        $statusStr = [
+            "0" => "短信发送成功",
+            "-1" => "参数不全",
+            "-2" => "服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！",
+            "30" => "密码错误",
+            "40" => "账号不存在",
+            "41" => "余额不足",
+            "42" => "帐户已过期",
+            "43" => "IP地址限制",
+            "50" => "内容含有敏感词"
+        ];
+        $smsData = [
+            'u' => 'jiajian',              // 帐户
+            'p' => md5('jiajian123'),      // 密码
+            'm' => '13285177013',          // 手机号
+            'c' => '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'],   // 内容
+        ];
+        $param  = http_build_query($smsData);
+        $smsApi = 'http://api.smsbao.com/sms?' . $param;
+        $result = file_get_contents($smsApi);
+
+        if($result == 0)
+        {
+            return [
+                'respMess' => $statusStr[$result],
+                'respCode' => 'success',
+            ];
+        }
+        else
+        {
+            return [
+                'respMess' => $statusStr[$result],
+                'respCode' => 'fail',
+            ];
+        }
+        
+        // 此处为短信业务逻辑  $result['data']['url']
+        // if($result['errno'] == 0)
+        // {
+
+            // echo $statusStr[$result];
+
+            // $smsapi = "http://api.smsbao.com/";
+            // $user   = 'jiajian';                      // 短信平台帐号
+            // $pass   = md5('jiajian123');              // 短信平台密码
+            // $content= '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];    // 短信内容
+            // $phone  = $account;                       //要发送短信的手机号码
+            // $sendurl= $smsapi."sms?u=".$user."&p=".$pass."&m=".$phone."&c=".urlencode($content);
+            // $result = file_get_contents($sendurl);
+            
+        // }
     }
 
     /**
@@ -406,12 +463,15 @@ class Pay extends Base
     }
 
     /**
-     * 双乾快捷支付 捐款接口(须先签约)(若启用短信通道，须调用交易接口，非启用则直接完成支付，异步通知更新业务逻辑)
+     * 双乾快捷支付 扣款接口(须先签约)(若启用短信通道，须调用交易接口，非启用则直接完成支付，异步通知更新业务逻辑)
      */
     public function consume()
     {
+        // 手机号
         $phone = Request::instance()->param('phone');
-        $price = Request::instance()->param('price');
+
+        // 扣款总金额
+        $price = (int)Request::instance()->param('price');
 
         // 验证是否签约
         $result = Db::name('wh_auth')
@@ -435,18 +495,55 @@ class Pay extends Base
         // 订单号
         $merOrderNo = 'JJZf' . time() . mt_rand(10000, 99999);
 
+        // 验证 扣款总金额 不能大于 预计扣款金
+        if( $price > $result['pay_money'] )
+        {
+            return json([
+                'resFlag' => 'false',
+                'resMess' => '扣款总金额不能大于预计扣款金',
+            ]);
+        }
+        
+        // 分期数
+        $stages = (int)$result['stages'];
+
+        // 分期数据
+        $stagesArr = [];
+
+        // 单期金额 (总扣款/分期数)
+        $singleTotal = round($price / $stages, 2);
+
+        // 计算单期金额
+        for ($i = 1; $i <= $stages; $i++)
+        { 
+            $stagesArr[] = [
+                'order_no'  => $merOrderNo . $i,
+                'price'     => $singleTotal
+            ];
+        }
+
+
+
+
+
+        /**
+         * =======================================================================================
+         * 第一期支付订单
+         * =======================================================================================
+         */
+
         // 支付请求数据
         $postData = [   
-            'merNo'     => $result['mer_no'],                                        // 商户号
-            'custName'  => $result['cust_name'],                                             // 姓名
-            'cardNo'    => $result['card_no'],                               // 银行卡号
-            'phone'     => $result['phone'],                                       // 手机号
-            'idNo'      => $result['id_no'],                                // 身份证
+            'merNo'     => $result['mer_no'],                                   // 商户号
+            'custName'  => $result['cust_name'],                                // 姓名
+            'cardNo'    => $result['card_no'],                                  // 银行卡号
+            'phone'     => $result['phone'],                                    // 手机号
+            'idNo'      => $result['id_no'],                                    // 身份证
             'idType'    => 0,                                                   // 证件类型（0.身份证）
-            'payAmount' => $price,                                                // 交易金额（单位元，小数保留2位）
-            'merOrderNo'=> $merOrderNo,                                         // 商户订单号
-            'bankCode'  => $result['bank_code'],                                               // 银行代码
-            'payType'   => $result['pay_type'],                                             // 校验渠道 固定：XYPAY
+            'payAmount' => $stagesArr[0]['price'],                              // 交易金额（单位元，小数保留2位）
+            'merOrderNo'=> $stagesArr[0]['order_no'],                           // 商户订单号
+            'bankCode'  => $result['bank_code'],                                // 银行代码
+            'payType'   => $result['pay_type'],                                 // 校验渠道 固定：XYPAY
             'cardType'  => 1,                                                   // 卡类型（1.借记卡 2.贷记卡）
             'NotifyURL' => Config::get('notify_url'),                           // 异步通知地址(选填)
             'transDate' => date('Ymd'),                                         // 交易日期
@@ -476,6 +573,14 @@ class Pay extends Base
         $strBeforeMd5 = $joinMapValue . strtoupper(md5($this->MD5key));
         $postData['MD5Info'] = strtoupper(md5($strBeforeMd5));
 
+        /**
+         * ========================================== 结束 =============================================
+         */
+
+
+
+
+
 
         // 所属企业ID
         $eData = Db::name('wh_user')
@@ -486,20 +591,36 @@ class Pay extends Base
 
         $company_id = empty($eData) ? -1 : $eData['company_id'];
 
-        // 交易订单入库
-        $bool = Db::name('wh_pay_order')->insert([
-            'uid'       => $this->uid,
-            'type'      => $type,
-            'cust_name' => $postData['custName'],
-            'phone'     => $postData['phone'],
-            'card_no'   => $postData['cardNo'],
-            'bank_code' => $postData['bankCode'],
-            'id_no'     => $postData['idNo'],
-            'price'     => $postData['payAmount'] * 100,
-            'order_no'  => $postData['merOrderNo'],
-            'createtime'=> time(),
-            'company_id'=> $company_id,
-        ]);
+        // 分期交易订单入库
+
+        // 支付扣款日
+        $day = date('d') > 28 ? 28 : date('d');
+        
+        // 初始化数组
+        $data = [];
+        foreach ($stagesArr as $key => $val) 
+        {
+            $status = $key == 0 ? 2 : 3;
+
+            $data[] = [
+                'uid'       => $this->uid,
+                'type'      => $type,
+                'mer_no'    => $postData['merNo'],
+                'cust_name' => $postData['custName'],
+                'phone'     => $postData['phone'],
+                'card_no'   => $postData['cardNo'],
+                'bank_code' => $postData['bankCode'],
+                'id_no'     => $postData['idNo'],
+                'price'     => $val['price'] * 100,
+                'order_no'  => $val['order_no'],
+                'createtime'=> time(),
+                'day'       => $day,
+                'status'    => $status,       // 1.成功 2.异常 3.分期
+                'company_id'=> $company_id,
+            ];
+        }
+
+        $bool = Db::name('wh_pay_order')->insertAll($data);
 
         if($bool)
         {
