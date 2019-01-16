@@ -70,6 +70,10 @@ Route::post('api/:version/addapply', 'jjapi/:version.AccountApply/addApply');
 
 //充值
 Route::post('api/:version/recharge', 'jjapi/:version.Recharge/rechargeOrder');
+//支付宝回调
+Route::post('api/:version/alipaynotify', 'jjapi/:version.Recharge/alipayNotify');
+//微信回调
+Route::post('api/:version/wxpaynotify', 'jjapi/:verison.Recharge/wxpayNotify');
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');

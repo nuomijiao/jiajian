@@ -11,6 +11,7 @@ namespace app\jjapi\controller\v1;
 
 use app\jjapi\controller\BaseController;
 use app\jjapi\model\WhUser;
+use app\jjapi\service\AliNotify;
 use app\jjapi\service\Recharge as RechargeService;
 use app\jjapi\service\Token;
 use app\jjapi\service\WxNotify;
@@ -20,6 +21,7 @@ use app\lib\exception\UserException;
 use think\Loader;
 
 Loader::import('WxPay.WxPay', EXTEND_PATH, '.Api.php');
+
 
 class Recharge extends BaseController
 {
@@ -58,5 +60,12 @@ class Recharge extends BaseController
         $notify = new WxNotify();
         $notify->Handle($config);
 
+    }
+
+    public function alipayNotify()
+    {
+        $config = ['alipay_public_key' => config('aliyun.alipay_public_key')];
+        $notify = new AliNotify($config);
+        $notify->handle();
     }
 }
