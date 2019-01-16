@@ -12,7 +12,7 @@ namespace app\jjapi\validate;
 class MoneyRechagre extends BaseValidate
 {
     protected $rule = [
-        'money' => 'requier|gt:0',
+        'money' => 'require|gt:0',
         'pay_type' => 'require|in:1,2'
     ];
 
