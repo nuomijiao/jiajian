@@ -55,7 +55,7 @@ function rsaVerify($data, $alipay_public_key, $sign)  {
     $alipay_public_key='-----BEGIN PUBLIC KEY-----'.PHP_EOL.wordwrap($alipay_public_key, 64, "\n", true) .PHP_EOL.'-----END PUBLIC KEY-----';
     file_put_contents('log4.txt', $alipay_public_key, FILE_APPEND);
     $res=openssl_get_publickey($alipay_public_key);
-    file_put_contents('log3.txt', $res.PHP_EOL, FILE_APPEND);
+    file_put_contents('log3.txt', var_export($res, true).PHP_EOL, FILE_APPEND);
     if($res)
     {
         $result = (bool)openssl_verify($data, base64_decode($sign), $res);
