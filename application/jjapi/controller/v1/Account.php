@@ -26,7 +26,7 @@ class Account extends Base{
         $time = time();
 
         // 发送短信验证码
-        $bool = Base::sendSmsCode($phone, '[加减数据]验证码：' . $code . '5分钟内有效。');
+        $bool = Base::sendSmsCode($phone, '[加减数据]验证码：' . $code . '，5分钟内有效。');
 
         // 缓存验证码
         $pool = Db::name('wh_smscode')->insert([
