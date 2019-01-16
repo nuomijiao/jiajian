@@ -16,9 +16,12 @@
  */
 function createLinkstring($para) {
 	$arg  = "";
-	while (list ($key, $val) = each ($para)) {
-		$arg.=$key."=".$val."&";
-	}
+//	while (list ($key, $val) = each ($para)) {
+//		$arg.=$key."=".$val."&";
+//	}
+    foreach ($para as $key => $value) {
+        $arg .= $key . "=" . $value . "&";
+    }
 	//去掉最后一个&字符
 	$arg = substr($arg,0,count($arg)-2);
 	
