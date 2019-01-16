@@ -17,6 +17,47 @@ use app\lib\exception\UserException;
 class Account extends Base{
 
     /**
+     * 电子合同签约手机验证码
+     */
+    public function send_smscode()
+    {
+        $phone = Request::instance()->param('phone');
+        $code  = mt_rand(1000, 9999);
+        $time = time();
+
+        // 发送短信验证码
+        $bool = Base::sendSmsCode($phone, '[加减数据]验证码：' . $code . '5分钟内有效。');
+
+        // 缓存验证码
+        $pool = Db::name('wh_smscode')->insert([
+            'mobile_number' => $phone,
+            'validate_code' => $code,
+            'create_time'   => $time,
+            'expire_time'   => $time + 300, // 验证码有效期5分钟(300秒)
+            'type'          => 3,
+        ]);
+
+        // 此处应加事务处理，暂时取消
+
+        if($bool && $pool)
+        {
+            $json = json([
+                'errcode' => 200,
+                'errmsg'  => '操作成功',
+            ]);
+        }
+        else
+        {
+            $json = json([
+                'errcode' => 204,
+                'errmsg'  => '操作失败，请稍后再试',
+            ]);
+        }
+
+        return $json;
+    }
+
+    /**
      * 电子合同签约
      */
     public function contract()
@@ -31,6 +72,24 @@ class Account extends Base{
             ]);   
         }
 
+        // 手机验证码 验证
+        $late = Db::name('wh_smscode')
+                ->where([
+                    'mobile_number' => $postData['phone'],
+                    'validate_code' => $postData['code'],
+                    'type'          => 3,
+                ])
+                ->order('id desc')
+                ->find();
+
+        if(empty($late) || $late['expire_time'] < time())
+        {
+            return json([
+                'errcode' => 204,
+                'errmsg'  => '手机验证码已经过期',
+            ]); 
+        }
+
         // 所属企业ID
         $eData = Db::name('wh_user')
                 ->where([
@@ -43,6 +102,7 @@ class Account extends Base{
         // 写入数据
         $postData['uid'] = $this->uid;
         $postData['company_id'] = $company_id;
+        unset($postData['phone']);
 
         $bool = Db::name('wh_contract')->insert($postData);
 

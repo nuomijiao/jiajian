@@ -341,36 +341,16 @@ class Pay extends Base
 
         $result = json_decode($response, true);
 
-        var_dump($result);exit;
-
         if($result['errno'] != 0)
         {
             return $result;
         }
 
-        // 短信发送
-        $statusStr = [
-            "0" => "短信发送成功",
-            "-1" => "参数不全",
-            "-2" => "服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！",
-            "30" => "密码错误",
-            "40" => "账号不存在",
-            "41" => "余额不足",
-            "42" => "帐户已过期",
-            "43" => "IP地址限制",
-            "50" => "内容含有敏感词"
-        ];
-        $smsData = [
-            'u' => 'jiajian',              // 帐户
-            'p' => md5('jiajian123'),      // 密码
-            'm' => '13285177013',          // 手机号
-            'c' => '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'],   // 内容
-        ];
-        $param  = http_build_query($smsData);
-        $smsApi = 'http://api.smsbao.com/sms?' . $param;
-        $result = file_get_contents($smsApi);
+        $content = '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];
 
-        if($result == 0)
+        $bool = Base::sendSmsCode($account, $content);
+
+        if($content)
         {
             return [
                 'respMess' => $statusStr[$result],
