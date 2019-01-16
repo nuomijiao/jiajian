@@ -72,6 +72,7 @@ class AlipayNotify {
             if ($isSign) {
                 return true;
             } else {
+                file_put_contents('log.txt', '4444'.PHP_EOL, FILE_APPEND);
                 return false;
             }
 		}
@@ -109,7 +110,6 @@ class AlipayNotify {
 			if (preg_match("/true$/i",$responseTxt) && $isSign) {
 				return true;
 			} else {
-				file_put_contents('log.txt', '4444'.PHP_EOL, FILE_APPEND);
 				return false;
 			}
 		}
