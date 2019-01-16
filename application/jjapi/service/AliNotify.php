@@ -25,7 +25,6 @@ class AliNotify extends \AlipayNotify
     public function handle()
     {
         $sign = $this->verifyNotify();
-        file_put_contents('log.txt', $sign.PHP_EOL, FILE_APPEND);
         if ($sign) {
             if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
                 $orderNo = $_POST['out_trade_no'];
@@ -33,6 +32,8 @@ class AliNotify extends \AlipayNotify
                 file_put_contents('log.txt', $orderNo.PHP_EOL, FILE_APPEND);
                 RechargeService::dealRechargeOrder($order);
             }
+        } else {
+            return 'success';
         }
     }
 }

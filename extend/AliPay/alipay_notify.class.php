@@ -72,7 +72,6 @@ class AlipayNotify {
             if ($isSign) {
                 return true;
             } else {
-                file_put_contents('log.txt', '4444'.PHP_EOL, FILE_APPEND);
                 return false;
             }
 		}
@@ -122,16 +121,16 @@ class AlipayNotify {
      * @return 签名验证结果
      */
 	function getSignVeryfy($para_temp, $sign) {
-		file_put_contents('log1.txt', "111".$sign.PHP_EOL, FILE_APPEND);
+		file_put_contents('log1.txt', $sign.PHP_EOL, FILE_APPEND);
 		//除去待签名参数数组中的空值和签名参数
 		$para_filter = paraFilter($para_temp);
-        file_put_contents('log1.txt', "222".$para_filter.PHP_EOL, FILE_APPEND);
+        file_put_contents('log2.txt', var_export($para_filter, true).PHP_EOL, FILE_APPEND);
 		//对待签名参数数组排序
 		$para_sort = argSort($para_filter);
-        file_put_contents('log1.txt', "333".$para_sort.PHP_EOL, FILE_APPEND);
+        file_put_contents('log3.txt', var_export($para_sort, true).PHP_EOL, FILE_APPEND);
 		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
 		$prestr = createLinkstring($para_sort);
-        file_put_contents('log1.txt', "444".$prestr.PHP_EOL, FILE_APPEND);
+        file_put_contents('log4.txt', $prestr.PHP_EOL, FILE_APPEND);
 		$isSgin = false;
 		switch (strtoupper(trim($this->alipay_config['sign_type']))) {
 			case "RSA" :
