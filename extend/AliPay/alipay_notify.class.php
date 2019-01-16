@@ -38,12 +38,12 @@ class AlipayNotify {
      * @return 验证结果
      */
 	function verifyNotify(){
-		file_put_contents('log.txt', '222'.PHP_EOL, FILE_APPEND);
+
 		if(empty($_POST)) {//判断POST来的数组是否为空
 			return false;
 		}
 		else {
-            file_put_contents('log.txt', '333'.PHP_EOL, FILE_APPEND);
+
 			//生成签名结果
 			$isSign = $this->getSignVeryfy($_POST, $_POST["sign"]);
 			//获取支付宝远程服务器ATN结果（验证是否是支付宝发来的消息）
@@ -122,15 +122,16 @@ class AlipayNotify {
      * @return 签名验证结果
      */
 	function getSignVeryfy($para_temp, $sign) {
+		file_put_contents('log1.txt', $sign.PHP_EOL, FILE_APPEND);
 		//除去待签名参数数组中的空值和签名参数
 		$para_filter = paraFilter($para_temp);
-		
+        file_put_contents('log1.txt', $para_filter.PHP_EOL, FILE_APPEND);
 		//对待签名参数数组排序
 		$para_sort = argSort($para_filter);
-		
+        file_put_contents('log1.txt', $para_sort.PHP_EOL, FILE_APPEND);
 		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
 		$prestr = createLinkstring($para_sort);
-		
+        file_put_contents('log1.txt', $prestr.PHP_EOL, FILE_APPEND);
 		$isSgin = false;
 		switch (strtoupper(trim($this->alipay_config['sign_type']))) {
 			case "RSA" :

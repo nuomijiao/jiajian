@@ -25,7 +25,7 @@ Loader::import('WxPay.WxPay', EXTEND_PATH, '.Api.php');
 
 class Recharge extends BaseController
 {
-    public function rechargeOrder($money = '', $type = '')
+    public function rechargeOrder($money = '', $pay_type = '')
     {
         $request = (new MoneyRechagre())->goCheck();
         $uid = Token::getCurrentUid();
@@ -38,7 +38,7 @@ class Recharge extends BaseController
             ]);
         }
         //生成订单
-        $order = RechargeService::createOrder($money, $type, $uid);
+        $order = RechargeService::createOrder($money, $pay_type, $uid);
 
         return $this->jjreturn(['total' => $order->money, 'ordersn' => $order->order_sn]);
 
@@ -64,7 +64,7 @@ class Recharge extends BaseController
 
     public function alipayNotify()
     {
-        file_put_contents('log.txt', '1111'.PHP_EOL, FILE_APPEND);
+
         $config = ['alipay_public_key' => config('aliyun.alipay_public_key'), 'sign_type' => config('aliyun.sign_type'), 'transport' => config('aliyun.transport'), 'partner' => config('aliyun.partner')];
         $notify = new AliNotify($config);
 
