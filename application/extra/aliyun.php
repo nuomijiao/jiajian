@@ -29,6 +29,6 @@ return [
 
     'alipay_public_key' => 'MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCszzcP86t02+2k3IkpCgM9KE2QVKCXX0AeYYxlLyEQ7rWeCjRPH1bDJm+sNnyJfEOfYWxkrS0ICfl52o5nkWdOIC90CgSaTTX5durNRluOy4zyIJFtklt/ZD9DTnau7mBr3Tnb/uzMk3+pqzW+F/iVriFhlzpqSMX7U8I+pcdJMwIDAQAB',
     'sign_type' => 'RSA',
-    'transport' => 'http',
+    'transport' => 'https',
     'partner' => '2088431169714534',
 ];
