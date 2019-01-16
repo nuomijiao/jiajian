@@ -65,7 +65,7 @@ class Recharge extends BaseController
     public function alipayNotify()
     {
         file_put_contents('log.txt', '1111'.PHP_EOL, FILE_APPEND);
-        $config = ['alipay_public_key' => config('aliyun.alipay_public_key'), 'sign_type' => config('sign_type')];
+        $config = ['alipay_public_key' => config('aliyun.alipay_public_key'), 'sign_type' => config('aliyun.sign_type'), 'transport' => config('aliyun.transport')];
         $notify = new AliNotify($config);
 
         $notify->handle();
