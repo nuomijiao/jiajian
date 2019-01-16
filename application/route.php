@@ -68,6 +68,8 @@ Route::post('api/:version/addelite', 'jjapi/:version.Elite/addElite');
 //申请加盟商
 Route::post('api/:version/addapply', 'jjapi/:version.AccountApply/addApply');
 
+//充值
+Route::post('api/:version/recharge', 'jjapi/:version.Recharge/rechargeOrder');
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
