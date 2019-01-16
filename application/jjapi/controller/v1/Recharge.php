@@ -38,7 +38,7 @@ class Recharge extends BaseController
         //生成订单
         $order = RechargeService::createOrder($money, $type, $uid);
 
-        return $this->jjreturn(['total' => $order->money]);
+        return $this->jjreturn(['total' => $order->money, 'ordersn' => $order->order_sn]);
 
     }
 
