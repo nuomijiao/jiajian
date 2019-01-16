@@ -23,7 +23,8 @@ function createLinkstring($para) {
         $arg .= $key . "=" . $value . "&";
     }
 	//去掉最后一个&字符
-	$arg = substr($arg,0,count($arg)-2);
+    $arg = rtrim($arg, '&');
+//	$arg = substr($arg,0,count($arg)-2);
 	
 	//如果存在转义字符，那么去掉转义
 	if(get_magic_quotes_gpc()){$arg = stripslashes($arg);}
@@ -45,7 +46,8 @@ function createLinkstringUrlencode($para) {
 	    $arg .= $key . "=" . urlencode($value) . "&";
     }
 	//去掉最后一个&字符
-	$arg = substr($arg,0,count($arg)-2);
+    $arg = rtrim($arg, '&');
+//	$arg = substr($arg,0,count($arg)-2);
 	
 	//如果存在转义字符，那么去掉转义
 	if(get_magic_quotes_gpc()){$arg = stripslashes($arg);}
