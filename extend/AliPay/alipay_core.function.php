@@ -34,9 +34,13 @@ function createLinkstring($para) {
  */
 function createLinkstringUrlencode($para) {
 	$arg  = "";
-	while (list ($key, $val) = each ($para)) {
-		$arg.=$key."=".urlencode($val)."&";
-	}
+//	while (list ($key, $val) = each ($para)) {
+//		$arg.=$key."=".urlencode($val)."&";
+//	}
+
+	foreach ($para as $key => $value) {
+	    $arg .= $key . "=" . urlencode($value) . "&";
+    }
 	//去掉最后一个&字符
 	$arg = substr($arg,0,count($arg)-2);
 	
@@ -52,10 +56,14 @@ function createLinkstringUrlencode($para) {
  */
 function paraFilter($para) {
 	$para_filter = array();
-	while (list ($key, $val) = each ($para)) {
-		if($key == "sign" || $key == "sign_type" || $val == "")continue;
-		else	$para_filter[$key] = $para[$key];
-	}
+//	while (list ($key, $val) = each ($para)) {
+//		if($key == "sign" || $key == "sign_type" || $val == "")continue;
+//		else	$para_filter[$key] = $para[$key];
+//	}
+	foreach ($para as $key => $value) {
+	    if ($key == 'sign' || $key == 'sign_type' || $value == "") continue;
+	    else $para_filter[$key] = $para[$key];
+    }
 	return $para_filter;
 }
 /**
