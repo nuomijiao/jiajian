@@ -12,7 +12,7 @@ namespace app\jjapi\validate;
 class MoneyRechagre extends BaseValidate
 {
     protected $rule = [
-        'money' => 'requier|isMoney',
+        'money' => 'requier|gt:0',
         'pay_type' => 'require|in:1,2'
     ];
 
@@ -20,14 +20,14 @@ class MoneyRechagre extends BaseValidate
         'money' => '输入的正确的金额',
     ];
 
-    public function isMoney($value)
-    {
-        $rule = '/^([1-9]\d*(\.\d*[1-9])?)|(0\.\d*[1-9])$/';
-        $result = preg_match($rule, $value);
-        if ($result) {
-            return true;
-        } else {
-            return false;
-        }
-    }
+//    public function isMoney($value)
+//    {
+//        $rule = '/^([1-9]\d*(\.\d*[1-9])?)|(0\.\d*[1-9])$/';
+//        $result = preg_match($rule, $value);
+//        if ($result) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 }
