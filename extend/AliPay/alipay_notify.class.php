@@ -38,10 +38,12 @@ class AlipayNotify {
      * @return 验证结果
      */
 	function verifyNotify(){
+		file_put_contents('log.txt', '222'.PHP_EOL, FILE_APPEND);
 		if(empty($_POST)) {//判断POST来的数组是否为空
 			return false;
 		}
 		else {
+            file_put_contents('log.txt', '333'.PHP_EOL, FILE_APPEND);
 			//生成签名结果
 			$isSign = $this->getSignVeryfy($_POST, $_POST["sign"]);
 			//获取支付宝远程服务器ATN结果（验证是否是支付宝发来的消息）
