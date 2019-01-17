@@ -15,6 +15,7 @@
 
 require_once("alipay_core.function.php");
 require_once("alipay_rsa.function.php");
+require_once("alipay_config.class.php");
 
 class AlipayNotify {
     /**
@@ -27,11 +28,12 @@ class AlipayNotify {
 	var $http_verify_url = 'http://notify.alipay.com/trade/notify_query.do?';
 	var $alipay_config;
 
-	function __construct($alipay_config){
-		$this->alipay_config = $alipay_config;
+	function __construct(){
+		$config = new AliPayConfig();
+		$this->alipay_config = $config->getConfig();
 	}
-    function AlipayNotify($alipay_config) {
-    	$this->__construct($alipay_config);
+    function AlipayNotify() {
+    	$this->__construct();
     }
     /**
      * 针对notify_url验证消息是否是支付宝发出的合法消息
@@ -39,7 +41,7 @@ class AlipayNotify {
      */
 	function verifyNotify(){
 
-		if(empty($_POST)) {//判断POST来的数组是否为空
+		if(empty($_POST) || !is_array($_POST)) {//判断POST来的数组是否为空
 			return false;
 		}
 		else {
@@ -113,7 +115,56 @@ class AlipayNotify {
 			}
 		}
 	}
-	
+
+	function RsaVerify($return_data, $public_key, $ksort = true) {
+        if (empty($return_data) || !is_array($return_data)) {
+            return false;
+        }
+        $public_key = $this->chackKey($public_key);
+        $pkeyid = openssl_pkey_get_public($public_key);
+        if (empty($pkeyid)) {
+            return false;
+        }
+        $sign_types = $return_data['sign_type'];
+
+        $rsasign = $return_data['sign'];
+        unset($return_data['sign']);
+        unset($return_data['sign_type']);
+
+        if ($ksort) {
+            ksort($return_data);
+        }
+
+        if (is_array($return_data) && !empty($return_data)) {
+            $strdata = '';
+
+            foreach ($return_data as $k => $v) {
+                if (empty($v)) {
+                    continue;
+                }
+
+                if (is_array($v)) {
+                    $strdata .= $k . '=' . json_encode($v) . '&';
+                }
+                else {
+                    $strdata .= $k . '=' . $v . '&';
+                }
+            }
+        }
+        $strdata = trim($strdata, '&');
+        $rsasign = str_replace(' ', '+', $rsasign);
+        $rsasign = base64_decode($rsasign);
+        if($sign_types == "RSA2"){
+            $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid, OPENSSL_ALGO_SHA256);
+        }else{
+            $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid);
+        }
+        openssl_free_key($pkeyid);
+
+        return $rsaverify;
+	}
+
+
     /**
      * 获取返回时的签名验证结果
      * @param $para_temp 通知返回来的参数数组
@@ -121,16 +172,14 @@ class AlipayNotify {
      * @return 签名验证结果
      */
 	function getSignVeryfy($para_temp, $sign) {
-		file_put_contents('log1.txt', $sign.PHP_EOL, FILE_APPEND);
+
+
 		//除去待签名参数数组中的空值和签名参数
 		$para_filter = paraFilter($para_temp);
-        file_put_contents('log2.txt', var_export($para_filter, true).PHP_EOL, FILE_APPEND);
 		//对待签名参数数组排序
 		$para_sort = argSort($para_filter);
-        file_put_contents('log3.txt', var_export($para_sort, true).PHP_EOL, FILE_APPEND);
 		//把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
 		$prestr = createLinkstring($para_sort);
-        file_put_contents('log4.txt', $prestr.PHP_EOL, FILE_APPEND);
 		$isSgin = false;
 		switch (strtoupper(trim($this->alipay_config['sign_type']))) {
 			case "RSA" :
@@ -142,6 +191,41 @@ class AlipayNotify {
 		
 		return $isSgin;
 	}
+
+//	add By JIao
+
+	function chackKey($key, $public = true)
+	{
+        if (empty($key)) {
+            return $key;
+        }
+
+        if ($public) {
+            if ($this->strexists($key, '-----BEGIN PUBLIC KEY-----')) {
+                $key = str_replace(array('-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----'), '', $key);
+            }
+
+            $head_end = "-----BEGIN PUBLIC KEY-----\n{key}\n-----END PUBLIC KEY-----";
+        }
+        else {
+            if ($this->strexists($key, '-----BEGIN RSA PRIVATE KEY-----')) {
+                $key = str_replace(array('-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----'), '', $key);
+            }
+
+            $head_end = "-----BEGIN RSA PRIVATE KEY-----\n{key}\n-----END RSA PRIVATE KEY-----";
+        }
+
+        $key = str_replace(array("\r\n", "\r", "\n"), '', trim($key));
+        $key = wordwrap($key, 64, "\n", true);
+        return str_replace('{key}', $key, $head_end);
+	}
+
+	function strexists($string, $find)
+	{
+        return !(strpos($string, $find) === FALSE);
+	}
+
+//	add By Jiao
 
     /**
      * 获取远程服务器ATN结果,验证返回URL

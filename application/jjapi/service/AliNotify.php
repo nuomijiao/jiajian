@@ -17,14 +17,9 @@ Loader::import('AliPay.alipay_notify', EXTEND_PATH, '.class.php');
 class AliNotify extends \AlipayNotify
 {
 
-    public function __construct($alipay_config)
-    {
-        parent::__construct($alipay_config);
-    }
-
     public function handle()
     {
-        $sign = $this->verifyNotify();
+        $sign = $this->RsaVerify($_POST, $this->alipay_config['alipay_public_key']);
         if ($sign) {
             if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
                 $orderNo = $_POST['out_trade_no'];
