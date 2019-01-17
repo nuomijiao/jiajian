@@ -15,6 +15,7 @@ use app\jjapi\model\WhBalanceDetail;
 use app\jjapi\model\WhUser;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
+use app\jjapi\validate\PagingParameter;
 use app\jjapi\validate\UserInfo;
 use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
@@ -63,8 +64,9 @@ class User extends BaseController
     }
 
 
-    public function getBalanceDetail()
+    public function getBalanceDetail($page = 1, $size = 10)
     {
+        (new PagingParameter())->goCheck();
         $uid = Token::getCurrentUid();
         $userInfo = WhUser::get($uid);
         if (!$userInfo->is_main_user) {
@@ -74,15 +76,28 @@ class User extends BaseController
             ]);
         }
         if (UserDegreeEnum::JingYing == $userInfo->degree) {
-            $detail = WhBalanceDetail::getDetailByUser($uid);
+            $pagingDetailList = WhBalanceDetail::getDetailByUser($uid, $page, $size);
+
             $surplus = $userInfo->surplus;
         } elseif (UserDegreeEnum::QiYe == $userInfo->degree) {
             $adminInfo = Admin::getCompanyByUserId($uid);
-            $detail = WhBalanceDetail::getDetailByCompany($adminInfo->id);
+            $pagingDetailList = WhBalanceDetail::getDetailByCompany($adminInfo->id, $page, $size);
             $surplus = $adminInfo->surplus;
         }
+        if ($pagingDetailList->isEmpty()) {
+            throw new UserException([
+                'msg' => '明细已见底',
+                'errorCode' => 30009,
+            ]);
+        }
+        $data = $pagingDetailList->toArray();
+        return json([
+            'error_code' => 'Success',
+            'data' => $data,
+            'current_page' => $pagingDetailList->getCurrentPage(),
+            'surplus' => $surplus,
+        ]);
 
-        return $this->jjreturn(['detail' => $detail, 'surplus' => $surplus]);
     }
 
 }

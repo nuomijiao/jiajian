@@ -13,13 +13,13 @@ class WhBalanceDetail extends BaseModel
 {
     protected $autoWriteTimestamp = true;
 
-    public static function getDetailByUser($uid)
+    public static function getDetailByUser($uid, $page, $size)
     {
-        return self::where('user_id', '=', $uid)->order('create_time', 'desc')->select();
+        return self::where('user_id', '=', $uid)->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
     }
 
-    public static function getDetailByCompany($cid)
+    public static function getDetailByCompany($cid, $page, $size)
     {
-        return self::where('company_id', '=', $cid)->order('create_time', 'desc')->select();
+        return self::where('company_id', '=', $cid)->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
     }
 }

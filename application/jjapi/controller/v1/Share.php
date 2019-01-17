@@ -15,6 +15,7 @@ use app\jjapi\model\WhTempImgs;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
 use app\jjapi\validate\IDMustBePositiveInt;
+use app\jjapi\validate\PagingParameter;
 use app\jjapi\validate\ShareNew;
 use app\jjapi\validate\TypeMustBePositiveInt;
 use app\lib\enum\ShareTypeEnum;
@@ -42,6 +43,7 @@ class Share extends BaseController
     //上传分享内容。客户或产品
     public function addShare($type = ShareTypeEnum::Product)
     {
+
         (new TypeMustBePositiveInt())->goCheck();
         $request = (new ShareNew())->goCheck();
         $title = $request->param('title');
@@ -55,6 +57,7 @@ class Share extends BaseController
 
     public function getShareList($type = ShareTypeEnum::Product, $page = 1, $size = 10)
     {
+        (new PagingParameter())->goCheck();
         (new TypeMustBePositiveInt())->goCheck();
         $pagingShareList = WhShare::getShareList($type, $page, $size);
         if ($pagingShareList->isEmpty()) {
