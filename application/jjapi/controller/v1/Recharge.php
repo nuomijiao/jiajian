@@ -65,7 +65,6 @@ class Recharge extends BaseController
     public function alipayNotify()
     {
 
-
         $notify = new AliNotify();
 
         $notify->handle();
