@@ -30,6 +30,7 @@ class AliNotify
 
     public function handle()
     {
+
         $sign = $this->RsaVerify($_POST, $this->alipay_config['alipay_public_key']);
         if ($sign) {
             if ($_POST['trade_status'] == 'TRADE_SUCCESS') {
@@ -45,6 +46,32 @@ class AliNotify
 
     public function RSAVerify($return_data, $public_key, $ksort = true)
     {
+        $return_data = array (
+            'discount' => '0.00',
+            'payment_type' => '1',
+            'trade_no' => '2019011722001470391012185913',
+            'subject' => 'B117929095101751',
+            'buyer_email' => 'dbj***@163.com',
+            'gmt_create' => '2019-01-17 10:41:53',
+            'notify_type' => 'trade_status_sync',
+            'quantity' => '1',
+            'out_trade_no' => 'B117929095101751',
+            'seller_id' => '2088431169714534',
+            'notify_time' => '2019-01-17 10:55:06',
+            'body' => '充值支付',
+            'trade_status' => 'WAIT_BUYER_PAY',
+            'is_total_fee_adjust' => 'Y',
+            'total_fee' => '0.01',
+            'seller_email' => '18625221511@163.com',
+            'price' => '0.01',
+            'buyer_id' => '2088012577070399',
+            'notify_id' => '2019011700222104153070391036851770',
+            'use_coupon' => 'N',
+            'sign_type' => 'RSA',
+            'sign' => 'CwFloJqnQXBhEsQUeiRNZIivpIpsgbpQwuzw17IZm/21nAIV1BFSNs2cqSgGDTcNagQYQylzVnKhqnDBCVK91LxHrU5mFZ1S8ZuMprISSwP6zqw4h9cH6YlXwA8Pqdcv+O/rvYPOz+Dfgl9z6lNo9+9SffxsJfCgGvVuGB2r4WI=',
+        );
+
+
         if (empty($return_data) || !is_array($return_data)) {
             return false;
         }
@@ -87,6 +114,8 @@ class AliNotify
         file_put_contents('log2.txt', $strdata.PHP_EOL, FILE_APPEND);
         $rsasign = str_replace(' ', '+', $rsasign);
         $rsasign = base64_decode($rsasign);
+
+
         file_put_contents('log3.txt', $rsasign.PHP_EOL, FILE_APPEND);
         if($sign_types == "RSA2"){
             $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid, OPENSSL_ALGO_SHA256);
