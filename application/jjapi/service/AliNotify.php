@@ -50,9 +50,11 @@ class AliNotify
         }
         file_put_contents('log.txt', var_export($return_data, true).PHP_EOL, FILE_APPEND);
         $public_key = $this->chackKey($public_key);
+        file_put_contents('log4.txt', $public_key.PHP_EOL, FILE_APPEND);
         $pkeyid = openssl_pkey_get_public($public_key);
         if (empty($pkeyid)) {
             return false;
+            file_put_contents('log5.txt', '111'.PHP_EOL, FILE_APPEND);
         }
 
         $sign_types = $return_data['sign_type'];
