@@ -47,9 +47,7 @@ class Recharge extends BaseController
     public function rechargeNotify($ordersn = '')
     {
         (new NotifyOrder())->goCheck();
-
         $order = RechargeService::checkOperate($ordersn);
-
         RechargeService::dealRechargeOrder($order);
     }
 
@@ -64,9 +62,7 @@ class Recharge extends BaseController
 
     public function alipayNotify()
     {
-
         $notify = new AliNotify();
-
         $notify->handle();
     }
 }
