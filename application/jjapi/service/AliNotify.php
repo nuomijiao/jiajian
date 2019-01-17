@@ -48,11 +48,13 @@ class AliNotify
         if (empty($return_data) || !is_array($return_data)) {
             return false;
         }
+        file_put_contents('log.txt', var_export($return_data, true).PHP_EOL, FILE_APPEND);
         $public_key = $this->chackKey($public_key);
         $pkeyid = openssl_pkey_get_public($public_key);
         if (empty($pkeyid)) {
             return false;
         }
+
         $sign_types = $return_data['sign_type'];
 
         $rsasign = $return_data['sign'];
@@ -80,8 +82,10 @@ class AliNotify
             }
         }
         $strdata = trim($strdata, '&');
+        file_put_contents('log2.txt', $strdata.PHP_EOL, FILE_APPEND);
         $rsasign = str_replace(' ', '+', $rsasign);
         $rsasign = base64_decode($rsasign);
+        file_put_contents('log3.txt', $rsasign.PHP_EOL, FILE_APPEND);
         if($sign_types == "RSA2"){
             $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid, OPENSSL_ALGO_SHA256);
         }else{
