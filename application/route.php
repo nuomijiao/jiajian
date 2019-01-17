@@ -61,6 +61,8 @@ Route::post('api/:version/modifyheadimg', 'jjapi/:version.User/modifyHeadImg');
 //修改信息
 Route::post('api/:version/saveinfo', 'jjapi/:version.User/saveInfo');
 
+
+
 //申请精英上传图片
 Route::post('api/:version/addeliteimg', 'jjapi/:version.Elite/addImg');
 //申请精英上传数据
@@ -70,6 +72,8 @@ Route::post('api/:version/addapply', 'jjapi/:version.AccountApply/addApply');
 
 //充值
 Route::post('api/:version/recharge', 'jjapi/:version.Recharge/rechargeOrder');
+//获取充值明细
+Route::get('api/:version/balancedetail', 'jjapi/:version.User/getBalanceDetail');
 //支付宝回调
 Route::post('api/:version/alipaynotify', 'jjapi/:version.Recharge/alipayNotify');
 //微信回调
