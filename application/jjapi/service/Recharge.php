@@ -10,9 +10,12 @@ namespace app\jjapi\service;
 
 
 use app\jjapi\model\Admin;
+use app\jjapi\model\WhBalanceDetail;
 use app\jjapi\model\WhRechargeOrder;
 use app\jjapi\model\WhUser;
+use app\lib\enum\BalanceChangeTypeEnum;
 use app\lib\enum\OrderStatusEnum;
+use app\lib\enum\RoleEnum;
 use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\OrderException;
 use app\lib\exception\ParameterException;
@@ -45,20 +48,35 @@ class Recharge
                 'status' => OrderStatusEnum::Paid,
             ]);
 
-
             //增加余额（企业账户后台账号和精英账户前台账号）
             //检查账号身份
+            //添加明细
             $userInfo = WhUser::get($order->user_id);
             if ($userInfo['degree'] == UserDegreeEnum::JingYing && $userInfo['is_main_user'] == 1) {
                 WhUser::update([
                     'id' => $userInfo->id,
                     'surplus' => $userInfo->surplus + $order->money,
                 ]);
+                WhBalanceDetail::create([
+                    'user_id' => $userInfo->id,
+                    'change_money' => $order->money,
+                    'change_type' => BalanceChangeTypeEnum::Recharge,
+                    'order_sn' => $order->order_sn,
+                    'type' => UserDegreeEnum::JingYing,
+                ]);
             } elseif ($userInfo['degree'] == UserDegreeEnum::QiYe && $userInfo['is_main_user'] == 1) {
                 $adminInfo = Admin::getCompanyByUserId($order->user_id);
                 Admin::update([
                     'id' => $adminInfo->id,
                     'surplus' => $adminInfo->surplus + $order->money,
+                ]);
+                WhBalanceDetail::create([
+                    'user_id' => $userInfo->id,
+                    'change_money' => $order->money,
+                    'change_type' => BalanceChangeTypeEnum::Recharge,
+                    'order_sn' => $order->order_sn,
+                    'type' => UserDegreeEnum::QiYe,
+                    'company_id' => $adminInfo->id,
                 ]);
             }
             Db::commit();

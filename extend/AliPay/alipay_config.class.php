@@ -15,6 +15,7 @@ class AliPayConfig
         'partner' => '2088431169714534',
     ];
 
+
     public function getConfig()
     {
         return $this->config;

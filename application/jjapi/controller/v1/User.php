@@ -10,10 +10,13 @@ namespace app\jjapi\controller\v1;
 
 
 use app\jjapi\controller\BaseController;
+use app\jjapi\model\Admin;
+use app\jjapi\model\WhBalanceDetail;
 use app\jjapi\model\WhUser;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
 use app\jjapi\validate\UserInfo;
+use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
 use app\lib\exception\UserException;
 
@@ -57,6 +60,29 @@ class User extends BaseController
         throw new SuccessMessage([
             'msg' => '修改成功'
         ]);
+    }
+
+
+    public function getBalanceDetail()
+    {
+        $uid = Token::getCurrentUid();
+        $userInfo = WhUser::get($uid);
+        if (!$userInfo->is_main_user) {
+            throw new UserException([
+                'msg' => '该账号没有资格',
+                'errorCode' => 30008,
+            ]);
+        }
+        if (UserDegreeEnum::JingYing == $userInfo->degree) {
+            $detail = WhBalanceDetail::getDetailByUser($uid);
+            $surplus = $userInfo->surplus;
+        } elseif (UserDegreeEnum::QiYe == $userInfo->degree) {
+            $adminInfo = Admin::getCompanyByUserId($uid);
+            $detail = WhBalanceDetail::getDetailByCompany($adminInfo->id);
+            $surplus = $adminInfo->surplus;
+        }
+
+        return $this->jjreturn(['detail' => $detail, 'surplus' => $surplus]);
     }
 
 }

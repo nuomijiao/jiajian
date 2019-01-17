@@ -33,7 +33,7 @@ class Recharge extends BaseController
         $isMainUser = WhUser::where('id', '=', $uid)->value('is_main_user');
         if (!$isMainUser) {
             throw new UserException([
-                'msg' => '该账号没有充值资格',
+                'msg' => '该账号没有资格',
                 'errorCode' => 30008
             ]);
         }
