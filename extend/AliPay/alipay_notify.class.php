@@ -116,54 +116,6 @@ class AlipayNotify {
 		}
 	}
 
-	function RsaVerify($return_data, $public_key, $ksort = true) {
-        if (empty($return_data) || !is_array($return_data)) {
-            return false;
-        }
-        $public_key = $this->chackKey($public_key);
-        $pkeyid = openssl_pkey_get_public($public_key);
-        if (empty($pkeyid)) {
-            return false;
-        }
-        $sign_types = $return_data['sign_type'];
-
-        $rsasign = $return_data['sign'];
-        unset($return_data['sign']);
-        unset($return_data['sign_type']);
-
-        if ($ksort) {
-            ksort($return_data);
-        }
-
-        if (is_array($return_data) && !empty($return_data)) {
-            $strdata = '';
-
-            foreach ($return_data as $k => $v) {
-                if (empty($v)) {
-                    continue;
-                }
-
-                if (is_array($v)) {
-                    $strdata .= $k . '=' . json_encode($v) . '&';
-                }
-                else {
-                    $strdata .= $k . '=' . $v . '&';
-                }
-            }
-        }
-        $strdata = trim($strdata, '&');
-        $rsasign = str_replace(' ', '+', $rsasign);
-        $rsasign = base64_decode($rsasign);
-        if($sign_types == "RSA2"){
-            $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid, OPENSSL_ALGO_SHA256);
-        }else{
-            $rsaverify = openssl_verify($strdata, $rsasign, $pkeyid);
-        }
-        openssl_free_key($pkeyid);
-
-        return $rsaverify;
-	}
-
 
     /**
      * 获取返回时的签名验证结果
@@ -192,40 +144,6 @@ class AlipayNotify {
 		return $isSgin;
 	}
 
-//	add By JIao
-
-	function chackKey($key, $public = true)
-	{
-        if (empty($key)) {
-            return $key;
-        }
-
-        if ($public) {
-            if ($this->strexists($key, '-----BEGIN PUBLIC KEY-----')) {
-                $key = str_replace(array('-----BEGIN PUBLIC KEY-----', '-----END PUBLIC KEY-----'), '', $key);
-            }
-
-            $head_end = "-----BEGIN PUBLIC KEY-----\n{key}\n-----END PUBLIC KEY-----";
-        }
-        else {
-            if ($this->strexists($key, '-----BEGIN RSA PRIVATE KEY-----')) {
-                $key = str_replace(array('-----BEGIN RSA PRIVATE KEY-----', '-----END RSA PRIVATE KEY-----'), '', $key);
-            }
-
-            $head_end = "-----BEGIN RSA PRIVATE KEY-----\n{key}\n-----END RSA PRIVATE KEY-----";
-        }
-
-        $key = str_replace(array("\r\n", "\r", "\n"), '', trim($key));
-        $key = wordwrap($key, 64, "\n", true);
-        return str_replace('{key}', $key, $head_end);
-	}
-
-	function strexists($string, $find)
-	{
-        return !(strpos($string, $find) === FALSE);
-	}
-
-//	add By Jiao
 
     /**
      * 获取远程服务器ATN结果,验证返回URL
