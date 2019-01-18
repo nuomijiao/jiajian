@@ -422,7 +422,6 @@ class WxPayApi
 	public static function notify($config, $callback, &$msg)
 	{
         $xml=file_get_contents("php://input");
-        file_put_contents('xml.txt',$xml.PHP_EOL, FILE_APPEND);
         if (!isset($xml)) {
 			# 如果没有数据，直接返回失败
             return false;

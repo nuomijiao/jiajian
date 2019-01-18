@@ -28,7 +28,7 @@ class WxNotify extends \WxPayNotify
             $order = WhRechargeOrder::getOrderByOrdersn($orderNo);
 
             RechargeService::dealRechargeOrder($order);
-
+            return true;
         } else {
             return true;
         }
