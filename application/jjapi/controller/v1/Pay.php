@@ -67,18 +67,18 @@ class Pay extends Base
         //     'cardNo'   => '6227002006600280380',
         //     'bankCode' => '建设银行',
         //     'idNo'     => '342221199110018230',
-        //     'authMsg'  => '761469',
+        //     'authMsg'  => '875402',
         //     'custType' => '02',
-
-        //     'stages'   => 1,
+        //     'type'     => 1,
+        //     'stages'   => 33,
         //     'payMoney' => 100,
         //     'paths'    => '1.jpg',
         // ];
 
         $postData   = Request::instance()->post();
         $type       = @$postData['type'];
-        $stages     = @$postData['stages'];                                     // 分期数
-        $payMoney   = @$postData['payMoney'];                                   // 预计捐款金
+        $stages     = (int)$postData['stages'];                                     // 分期数
+        $payMoney   = @$postData['payMoney'];                                   // 预计扣款金
         $paths      = @$postData['paths'];                                      // 身份证等图片路径
 
         // 银行代码 (此处业务逻辑应为前端处理，闹心)
@@ -141,14 +141,17 @@ class Pay extends Base
         $result = curlPost(Config::get('auth_url'), $postData);
         $result = json_decode($result, true);
 
+        // v($result);
+        $result['respCode'] = 'success';
+
         // 如果为签约则写入数据库
         if($result['respCode'] === 'success' && $postData['custType'] === '02')
         {
-            // 无需处理成功或失败
-            // 赋上上签流水号
-            $sid = $reqMsgId;
+            // 预计扣款金 单位分
+            $total = (float)$payMoney * 100;
 
-            Auth::insert([
+            // 签约信息入库
+            $authData = [
                 'uid'       => $this->uid,
                 'type'      => $type,
                 'mer_no'    => $this->merno,
@@ -160,37 +163,199 @@ class Pay extends Base
                 'req_msg_id'=> $reqMsgId,
                 'pay_type'  => $postData['payType'],
                 'stages'    => $stages,
-                'pay_money' => $payMoney,
+                'pay_money' => $total,
                 'paths'     => $paths,
-                'sid'       => $sid,
+                'sid'       => $reqMsgId,   // 上上签流水号和商户请求流水号设相同
                 'createtime'=> time(),
-            ]);
+            ];
+
+            // 分期数据
+            $data = [
+                'idNo'    => $postData['idNo'],
+                'phoneNo' => $postData['phoneNo'],
+                'custName'=> $postData['custName'],
+                'cardNo'  => $postData['cardNo'],
+                'sid'     => $reqMsgId,
+            ];
+
+            // 单期模板
+            if($stages == 1)  
+            {
+                $elements = [  
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.62',
+                        'type'   => 'text',
+                        'value'  => $postData['custName'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.65',
+                        'type'   => 'text',
+                        'value'  => $postData['idNo'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.69',
+                        'type'   => 'text',
+                        'value'  => $postData['cardNo'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.73',
+                        'type'   => 'text',
+                        'value'  => $postData['phoneNo'],
+                    ],
+                    [
+                        'pageNum'=> '2',
+                        'x'      => '0.30',
+                        'y'      => '0.10',
+                        'type'   => 'text',
+                        'value'  => $payMoney,
+                    ],
+                    [
+                        'pageNum'=> '3',
+                        'x'      => '0.23',
+                        'y'      => '0.57',
+                        'type'   => 'text',
+                        'value'  => date('Y-m-d'),
+                    ],
+                ];
+            }
+            else    // 多期模板
+            {
+                $elements = [  
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.62',
+                        'type'   => 'text',
+                        'value'  => $postData['custName'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.65',
+                        'type'   => 'text',
+                        'value'  => $postData['idNo'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.69',
+                        'type'   => 'text',
+                        'value'  => $postData['cardNo'],
+                    ],
+                    [
+                        'pageNum'=> '1',
+                        'x'      => '0.23',
+                        'y'      => '0.73',
+                        'type'   => 'text',
+                        'value'  => $postData['phoneNo'],
+                    ],
+                    [
+                        'pageNum'=> '3',
+                        'x'      => '0.23',
+                        'y'      => '0.57',
+                        'type'   => 'text',
+                        'value'  => date('Y-m-d'),
+                    ],
+                    [
+                        'pageNum'=> '2',
+                        'x'      => '0.18',
+                        'y'      => '0.14',
+                        'type'   => 'text',
+                        'value'  => $stages,
+                    ],
+                    [
+                        'pageNum'=> '2',
+                        'x'      => '0.34',
+                        'y'      => '0.14',
+                        'type'   => 'text',
+                        'value'  => date('d'),
+                    ],
+                ];
+
+                // 总期数
+                $num = 36;
+
+                // 坐标间隔表格数
+                $exp = 6;
+
+                // 初始XY坐标
+                $x = ['0.78', '0.28', '0.38', '0.48', '0.58', '0.68'];
+                $y = [0, '0.18', '0.22', '0.255', '0.295', '0.335', '0.37'];
+
+                // 金额取模
+                $remain = $total % $stages;
+
+                // 单期金额, 公式：总金额-(总金额%分期数)/分期数
+                $price = ($total - $remain) / $stages;
+
+                // 分期模板合成
+                for ($i = 1; $i <= $stages; $i++)
+                {
+                    array_unshift($elements, [
+                        'pageNum'=> '2',
+                        'x'      => $x[$i % $exp],
+                        'y'      => $y[ceil($i / $exp)],
+                        'type'   => 'text',
+                        'value'  => $price / 100,
+                    ]);
+                }
+
+                // 最后一期加余数
+                $elements[0]['value'] = $elements[0]['value'] + $remain / 100;
+            }
+
+            // 客户签约记录
+            $bool = Db::name('wh_auth')->insert($authData);
 
             // 上上签电子合同签约
-            $result = $this->shangShangQian($postData['idNo'],$postData['phoneNo'],$postData['custName'],$postData['cardNo'],$sid);
+            $result = $this->shangShangQian($data, $elements);
 
-            if($result['errno'] != 0)
+            if($result['errno'] == 0)
             {
                 return json([
-                    'respMess' => $result['errmsg'],
-                    'respCode' => 'false',
+                    'errcode' => 200,
+                    'errmsg'  => '签约成功'
+                ]);
+            }
+            else
+            {
+                return json([
+                    'errcode' => 204,
+                    'errmsg'  => $result['errmsg']
                 ]);
             }
         }
-        
-        return json($result);
-    }
-
-    public function ceshi()
-    {
-        $a = $this->shangShangQian('411221198909105071', '18625221512', '先生', '12121', '455545545445');
-        var_dump($a);
+        else    // 认证时
+        {
+            if($result['respCode'] === 'success')
+            {
+                return json([
+                    'errcode' => 200,
+                    'errmsg'  => '认证成功，请签约！'
+                ]);
+            }
+            else
+            {
+                return json([
+                    'errcode' => 204,
+                    'errmsg'  => $result['respMessage']
+                ]);
+            }
+        }
     }
 
     /**
      * 上上签 签约协议
      */
-    private function shangShangQian($idNo = '', $account = '', $name = '', $cardNo = '', $sid = '')
+    private function shangShangQian($data, $elements)
     {
         // $idNo = '343221199103201230';
         // $account = '15666589065';
@@ -205,12 +370,12 @@ class Pay extends Base
 
         // 注册
         $response = $bestSign->apiPost('/user/reg/', [
-            'account'       => $account,
-            'name'          => $name,
+            'account'       => $data['phoneNo'],
+            'name'          => $data['custName'],
             'userType'      => '1',
-            'mobile'        => $account,
+            'mobile'        => $data['phoneNo'],
             'credential'    => [
-                'identity'  => $idNo
+                'identity'  => $data['idNo']
             ],
             'applyCert'     => 1,
         ]);
@@ -234,7 +399,7 @@ class Pay extends Base
         // 上传合同
         $jjdocBase64 = base64_encode(file_get_contents(ROOT_PATH . 'jjdoc/jj.pdf'));
         $response = $bestSign->apiPost('/storage/upload/', [
-            'account'       => $account,
+            'account'       => $data['phoneNo'],
             'fmd5'          => md5_file(ROOT_PATH . 'jjdoc/jj.pdf'),
             'ftype'         => 'pdf',
             'fname'         => 'jj.pdf',
@@ -253,44 +418,8 @@ class Pay extends Base
         // 为合同添加元素
         $response = $bestSign->apiPost('/storage/addPdfElements/', [
             'fid'       => $result['data']['fid'],
-            'account'   => $account,
-            'elements'  => [
-                [
-                    'pageNum'=> '1',
-                    'x'      => '0.23',
-                    'y'      => '0.62',
-                    'type'   => 'text',
-                    'value'  => $name,
-                ],
-                [
-                    'pageNum'=> '1',
-                    'x'      => '0.23',
-                    'y'      => '0.65',
-                    'type'   => 'text',
-                    'value'  => $idNo,
-                ],
-                [
-                    'pageNum'=> '1',
-                    'x'      => '0.23',
-                    'y'      => '0.69',
-                    'type'   => 'text',
-                    'value'  => $cardNo,
-                ],
-                [
-                    'pageNum'=> '1',
-                    'x'      => '0.23',
-                    'y'      => '0.73',
-                    'type'   => 'text',
-                    'value'  => $account,
-                ],
-                [
-                    'pageNum'=> '3',
-                    'x'      => '0.23',
-                    'y'      => '0.57',
-                    'type'   => 'text',
-                    'value'  => date('Y-m-d'),
-                ],
-            ]
+            'account'   => $data['phoneNo'],
+            'elements'  => $elements,
         ]);
 
         $result = json_decode($response, true);
@@ -303,9 +432,9 @@ class Pay extends Base
         // 创建合同
         $time = time() + 31536000;
         $response = $bestSign->apiPost('/contract/create/', [
-            'account'       => $account,
+            'account'       => $data['phoneNo'],
             'fid'           => $result['data']['fid'],
-            'expireTime'    => "$time",
+            'expireTime'    => "{$time}",
             'title'         => '协议合同',
             'description'   => '签署的协议合同',
         ]);
@@ -321,11 +450,11 @@ class Pay extends Base
         $time = time() + 3600;
         $response = $bestSign->apiPost('/contract/send/', [
             'contractId'   => $result['data']['contractId'],
-            'signer'       => $account,
-            'expireTime'   => "$time",
+            'signer'       => $data['phoneNo'],
+            'expireTime'   => "{$time}",
             'dpi'          => '120',
             'isAllowChangeSignaturePosition' => '1',            // 允许拖动
-            'sid'          => $sid,                             // 业务流水号
+            'sid'          => $data['sid'],                     // 流水号
             'signatureImageName'    => 'default',               // 签名/印章
             'isDrawSignatureImage'  => '1',                     // 是否手绘签名
             'signaturePositions' => [
@@ -335,7 +464,7 @@ class Pay extends Base
                     'y'       => '0.6',
                 ],
             ],
-            'pushUrl' => 'http://www.skeep.cc/jjapi/v1/pay/notify',
+            'pushUrl' => 'http://jj.5d1.top/jjapi/v1/pay/notify',
             // 'returnUrl'     => 'https://www.baidu.com',
         ]);
 
@@ -346,40 +475,27 @@ class Pay extends Base
             return $result;
         }
 
+        // v($result);
+
+        // 发送短信
         $content = '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];
 
-        $bool = Base::sendSmsCode($account, $content);
+        $res = Base::sendSmsCode($data['phoneNo'], $content);
 
-        if($content)
+        if($res === 'ok')
         {
             return [
-                'respMess' => $statusStr[$result],
-                'respCode' => 'success',
+                'errno' => 0,
+                'errmsg'=> '成功',
             ];
         }
         else
         {
             return [
-                'respMess' => $statusStr[$result],
-                'respCode' => 'fail',
+                'errno' => 204,
+                'errmsg'=> $res,
             ];
         }
-        
-        // 此处为短信业务逻辑  $result['data']['url']
-        // if($result['errno'] == 0)
-        // {
-
-            // echo $statusStr[$result];
-
-            // $smsapi = "http://api.smsbao.com/";
-            // $user   = 'jiajian';                      // 短信平台帐号
-            // $pass   = md5('jiajian123');              // 短信平台密码
-            // $content= '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];    // 短信内容
-            // $phone  = $account;                       //要发送短信的手机号码
-            // $sendurl= $smsapi."sms?u=".$user."&p=".$pass."&m=".$phone."&c=".urlencode($content);
-            // $result = file_get_contents($sendurl);
-            
-        // }
     }
 
     /**
@@ -450,7 +566,7 @@ class Pay extends Base
         // 手机号
         $phone = Request::instance()->param('phone');
 
-        // 扣款总金额
+        // 扣款金额
         $price = (int)Request::instance()->param('price');
 
         // 验证是否签约
@@ -468,6 +584,14 @@ class Pay extends Base
                 'resMess' => '未认证或签约',
             ]);
         }
+        
+        // 所属企业ID
+        $eData = Db::name('wh_user')
+                ->where([
+                    'id' => $this->uid
+                ])
+                ->find();
+        $company_id = empty($eData) ? -1 : $eData['company_id'];
 
         // 交易类型（1.协议 2.大额）
         $type = $result['type'];
@@ -486,31 +610,6 @@ class Pay extends Base
         
         // 分期数
         $stages = (int)$result['stages'];
-
-        // 分期数据
-        $stagesArr = [];
-
-        // 单期金额 (总扣款/分期数)
-        $singleTotal = round($price / $stages, 2);
-
-        // 计算单期金额
-        for ($i = 1; $i <= $stages; $i++)
-        { 
-            $stagesArr[] = [
-                'order_no'  => $merOrderNo . $i,
-                'price'     => $singleTotal
-            ];
-        }
-
-
-
-
-
-        /**
-         * =======================================================================================
-         * 第一期支付订单
-         * =======================================================================================
-         */
 
         // 支付请求数据
         $postData = [   
@@ -553,54 +652,26 @@ class Pay extends Base
         $strBeforeMd5 = $joinMapValue . strtoupper(md5($this->MD5key));
         $postData['MD5Info'] = strtoupper(md5($strBeforeMd5));
 
-        /**
-         * ========================================== 结束 =============================================
-         */
 
+        // 订单入库
+        $data = [
+            'uid'       => $this->uid,
+            'type'      => $type,
+            'mer_no'    => $postData['merNo'],
+            'cust_name' => $postData['custName'],
+            'phone'     => $postData['phone'],
+            'card_no'   => $postData['cardNo'],
+            'bank_code' => $postData['bankCode'],
+            'id_no'     => $postData['idNo'],
+            'price'     => $price * 100,
+            'order_no'  => $merOrderNo,
+            'createtime'=> time(),
+            'day'       => $day,
+            'status'    => $status,       // 1.成功 2.异常 3.分期
+            'company_id'=> $company_id,
+        ];
 
-
-
-
-
-        // 所属企业ID
-        $eData = Db::name('wh_user')
-                ->where([
-                    'id' => $this->uid
-                ])
-                ->find();
-
-        $company_id = empty($eData) ? -1 : $eData['company_id'];
-
-        // 分期交易订单入库
-
-        // 支付扣款日
-        $day = date('d') > 28 ? 28 : date('d');
-        
-        // 初始化数组
-        $data = [];
-        foreach ($stagesArr as $key => $val) 
-        {
-            $status = $key == 0 ? 2 : 3;
-
-            $data[] = [
-                'uid'       => $this->uid,
-                'type'      => $type,
-                'mer_no'    => $postData['merNo'],
-                'cust_name' => $postData['custName'],
-                'phone'     => $postData['phone'],
-                'card_no'   => $postData['cardNo'],
-                'bank_code' => $postData['bankCode'],
-                'id_no'     => $postData['idNo'],
-                'price'     => $val['price'] * 100,
-                'order_no'  => $val['order_no'],
-                'createtime'=> time(),
-                'day'       => $day,
-                'status'    => $status,       // 1.成功 2.异常 3.分期
-                'company_id'=> $company_id,
-            ];
-        }
-
-        $bool = Db::name('wh_pay_order')->insertAll($data);
+        $bool = Db::name('wh_pay_order')->insert($data);
 
         if($bool)
         {
@@ -619,7 +690,7 @@ class Pay extends Base
     }
 
     /**
-     * 双乾快捷支付 交易接口(短信通道) 暂不使用
+     * 双乾快捷支付 交易接口(短信通道)
      */
     public function transaction()
     {
@@ -697,13 +768,60 @@ class Pay extends Base
 
         if(isset($postData['BillNo']))
         {
-            $bool = Db::name('wh_pay_order')
-                ->where([
-                    'order_no' => $postData['BillNo'],
-                ])
-                ->update([
-                    'status' => 1 // 更新支付订单状态 1为成功
-                ]);
+            // 查询订单
+            $result = Db::name('wh_pay_order')
+                    ->where([
+                        'order_no' => $postData['BillNo'],
+                    ])
+                    ->find();
+            
+            if(empty($result))
+            {
+                // 订单不存在 日志业务逻辑...
+
+                return false;
+            }
+
+            // 查询企业识别码
+            $userinfo = Db::name('wh_user')
+                    ->where('id', $result['uid'])
+                    ->find();
+
+            if(empty($userinfo))
+            {
+                // 企业不存在 异常日志业务逻辑...
+                return false;
+            }
+
+            // 启动事务
+            Db::startTrans();
+
+            try{
+                Db::name('wh_pay_order')
+                    ->where([
+                        'order_no' => $postData['BillNo'],
+                    ])
+                    ->update([
+                        'status' => 1 // 更新支付订单状态 1为成功
+                    ]);
+
+                Db::name('admin')
+                    ->where([
+                        'id' => $userinfo['company_id'],
+                        'id_code' => $userinfo['company_code']
+                    ])
+                    ->setInc('pay_surplus', (int)$result['price'] / 100); // 企业帐户余额同步加
+
+                // 事务提交
+                Db::commit(); 
+            } 
+            catch (\Exception $e) 
+            {
+                // 事务回滚
+                Db::rollback();
+
+                // 更新失败 日志处理...
+            }
         }
     }
 

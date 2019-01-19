@@ -24,9 +24,10 @@ class Base extends Controller
      */
     public function _initialize()
     {
+        // $this->uid = 1;
         if (Request::instance()->isPost())
         {
-            // $this->uid = 1;
+            
             $this->uid = Token::getCurrentUid();
         }
         else
@@ -48,15 +49,15 @@ class Base extends Controller
     {
         // 代码标题
         $statusStr = [
-            "0" => "短信发送成功",
-            "-1" => "参数不全",
-            "-2" => "服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！",
-            "30" => "密码错误",
-            "40" => "账号不存在",
-            "41" => "余额不足",
-            "42" => "帐户已过期",
-            "43" => "IP地址限制",
-            "50" => "内容含有敏感词"
+            "0" => "短信发送成功[短信宝]",
+            "-1" => "参数不全[短信宝]",
+            "-2" => "短信宝服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！[短信宝]",
+            "30" => "密码错误[短信宝]",
+            "40" => "账号不存在[短信宝]",
+            "41" => "余额不足[短信宝]",
+            "42" => "帐户已过期[短信宝]",
+            "43" => "IP地址限制[短信宝]",
+            "50" => "内容含有敏感词[短信宝]"
         ];
 
         $smsData = [
@@ -70,6 +71,6 @@ class Base extends Controller
         $smsApi = 'http://api.smsbao.com/sms?' . $param;
         $result = file_get_contents($smsApi);
 
-        return $result == 0 ? true : false;
+        return $result == 0 ? 'ok' : $statusStr[$result];
     }
 }

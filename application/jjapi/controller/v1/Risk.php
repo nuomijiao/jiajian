@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 风控接口(魔杖2.0开放平台)
+ * 风控接口(魔杖2.0和顶象技术)
  * Auther: wanggaoqi
  * Date: 2019.1.3
  */
@@ -17,9 +17,88 @@ use app\lib\exception\UserException;
 
 class Risk extends Base
 {
+
+    // ==================================== 顶象技术 ==================================
+
     /**
-     * 接口method方法列表
+     * 顶象接口
      */
+    public function dingxiang()
+    {
+        $name   = Request::instance()->param('name');
+        $idcard = Request::instance()->param('idcard');
+        $mobile = Request::instance()->param('mobile');
+
+        $json = [
+            'name'   => $name,
+            'idcard' => $idcard,
+            'mobile' => $mobile
+        ];
+
+        // 接口参数
+        $timeStamp  = time();
+        $customerId = 'd79ecff65925311772ede42d6f8fb294';
+        $appsecert  = 'f3bdd4303c61754190afc5d9f24efbed';
+
+        $sign = md5($appsecert . $customerId . $timeStamp . $appsecert);
+        $headers = [
+            'customerId:' . $customerId,
+            'timeStamp:' . $timeStamp,
+            'sign:' . $sign,
+            'Content-type: application/json; charset=utf-8',
+        ];
+
+        // 接口地址
+        $url = 'https://sec2.dingxiang-inc.com/api/dataplatform/dxantifraud';
+
+        // 请求接口
+        $result = $this->curlPost($url, $headers, $json);
+        $data = substr($result, 192);
+        $data = json_decode($data, true);
+        return json($data);
+    }
+
+    /**
+     * 接口请求curPost
+     */
+    public function curlPost($url, $headers, $json)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_HEADER, TRUE);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_4) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/66.0.3359.81 Safari/537.36");
+        //curl_setopt($ch, CURLOPT_POSTFIELDS, base64_encode(json_encode($json)));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, (json_encode($json)));
+        $data = curl_exec($ch);
+        //var_dump(curl_getinfo($ch));
+        // var_dump(curl_error($ch));
+        curl_close($ch);
+        return $data;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // ==================================== 魔杖2.0 ==================================
 
     /*
     moxie.api.risk.magicwand2.anti-fraud',          // 反欺诈报告
