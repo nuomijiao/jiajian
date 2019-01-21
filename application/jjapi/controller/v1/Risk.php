@@ -29,6 +29,26 @@ class Risk extends Base
         $idcard = Request::instance()->param('idcard');
         $mobile = Request::instance()->param('mobile');
 
+        // 所属企业ID
+        $eData = Db::name('wh_user')
+                ->where([
+                    'id' => $this->uid
+                ])
+                ->find();
+
+        $company_id = empty($eData) ? -1 : $eData['company_id'];
+
+        // 写入查询记录
+        Db::name('wh_bigdata_order')->insert([
+            'uid'    => $this->uid,
+            'name'   => $postData['name'],
+            'idcard' => $postData['idcard'],
+            'mobile' => $postData['mobile'],
+            'createtime' => time(),
+            'company_id' => $company_id,
+        ]);
+
+        // 请求接口
         $json = [
             'name'   => $name,
             'idcard' => $idcard,
@@ -51,7 +71,6 @@ class Risk extends Base
         // 接口地址
         $url = 'https://sec2.dingxiang-inc.com/api/dataplatform/dxantifraud';
 
-        // 请求接口
         $result = $this->curlPost($url, $headers, $json);
         $data = substr($result, 192);
         $data = json_decode($data, true);

@@ -62,7 +62,7 @@ class Base extends Controller
 
         $smsData = [
             'u' => 'jiajian',               // 帐户
-            'p' => md5('jiajian123'),       // 密码
+            'p' => md5('jiajian2019'),       // 密码
             'm' => $phone,                  // 手机号
             'c' => $content,                // 内容
         ];
