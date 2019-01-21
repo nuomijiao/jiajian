@@ -58,9 +58,12 @@ class Risk extends Base
         {
             // ==================================== 企业 ====================================
 
+            $table = 'admin';
+
             // 企业帐户 ID
             $account_id = $data['company_id'];
 
+            // 验证企业
             $data = Db::name('admin')
                 ->where([
                     'id' => $account_id
@@ -74,12 +77,9 @@ class Risk extends Base
                     'errmsg'  => '没有查询到您所在的企业'
                 ]);
             }
-
-            // 所要更新的帐户余额 表名
-            $table = 'admin';
         }
 
-        // 验证余额
+        // 验证 企业帐户或精英帐户 余额
         if((float)$data['surplus'] < 9.9)
         {
             return json([
