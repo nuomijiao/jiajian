@@ -29,57 +29,100 @@ class Risk extends Base
         $idcard = Request::instance()->param('idcard');
         $mobile = Request::instance()->param('mobile');
 
-        // 所属企业ID
-        $eData = Db::name('wh_user')
+        // 验证当前用户所在信息是否存在
+        $data = Db::name('wh_user')
                 ->where([
                     'id' => $this->uid
                 ])
                 ->find();
 
-        $company_id = empty($eData) ? -1 : $eData['company_id'];
-
-        // 写入查询记录
-        Db::name('wh_bigdata_order')->insert([
-            'uid'    => $this->uid,
-            'name'   => $name,
-            'idcard' => $idcard,
-            'mobile' => $mobile,
-            'createtime' => time(),
-            'company_id' => $company_id,
-        ]);
-
-        // 数据验证
-        $data = Db::name('admin')
-            ->where([
-                // 'role_id' => 6,
-                'id' => $company_id
-            ])
-            ->find();
-
-        // 验证所在企业
         if(empty($data))
         {
             return json([
                 'errcode' => 202,
-                'errmsg'  => '没有查询到所在企业相关信息'
+                'errmsg'  => '没有查询到当前用户相关信息'
             ]);
         }
 
+        // 验证精英or企业
+        if($data['degree'] == 1)    
+        {
+            // =================================== 精英 =====================================
+
+            $table = 'wh_user';
+        }
+        else    
+        {
+            // ==================================== 企业 ====================================
+
+            // 企业ID
+            $company_id = $data['company_id'];
+
+            $data = Db::name('admin')
+                ->where([
+                    'id' => $company_id
+                ])
+                ->find(); 
+
+            if(empty($data))
+            {
+                return json([
+                    'errcode' => 202,
+                    'errmsg'  => '没有查询到您所在的企业'
+                ]);
+            }
+
+            // 所要更新的帐户余额 表名
+            $table = 'admin';
+        }
+
         // 验证余额
-        if((float)data['surplus'] < 9.9)
+        if((float)$data['surplus'] < 9.9)
         {
             return json([
-                'errcode' => 202,
+                'errcode' => 203,
                 'errmsg'  => '余额不足'
             ]);
         }
 
-        // 更新余额
-        Db::name('admin')
-            ->where('id', $company_id)
-            ->setDec('surplus', 9.9);
+        // ================================= 更新余额、查询记录入库 ============================
 
-        // 请求接口
+        // 事务启动
+        Db::startTrans();
+
+        try{
+            // 更新余额
+            Db::name($table)
+                ->where('id', $company_id)
+                ->setDec('surplus', 9.9);
+
+            // 查询记录入库
+            Db::name('wh_bigdata_order')->insert([
+                'uid'    => $this->uid,
+                'name'   => $name,
+                'idcard' => $idcard,
+                'mobile' => $mobile,
+                'createtime' => time(),
+                'company_id' => $company_id,
+            ]);
+
+            // 事务提交
+            Db::commit(); 
+        } 
+        catch (\Exception $e) 
+        {
+            // 事务回滚
+            Db::rollback();
+
+            return json([
+                'errcode' => 204,
+                'errmsg'  => '事务提交失败, 余额和订单异常'
+            ]);
+        }
+
+
+        // ================================== 查询请求（顶象接口） ===================================
+
         $json = [
             'name'   => $name,
             'idcard' => $idcard,
@@ -105,6 +148,7 @@ class Risk extends Base
         $result = $this->curlPost($url, $headers, $json);
         $data = substr($result, 192);
         $data = json_decode($data, true);
+
         return json($data);
     }
 
