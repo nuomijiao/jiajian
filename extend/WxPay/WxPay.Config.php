@@ -29,11 +29,11 @@ class WxPayConfig extends WxPayConfigInterface
      */
     public function GetAppId()
     {
-        return 'wx38e303a852c31365';
+        return 'wxc009f0c347d548c4';
     }
     public function GetMerchantId()
     {
-        return '1511961301';
+        return '1523494301';
     }
 
     //=======【支付相关配置：支付成功回调地址/签名方式】===================================
@@ -43,7 +43,7 @@ class WxPayConfig extends WxPayConfigInterface
      **/
     public function GetNotifyUrl()
     {
-        return "https://dywq.whwap.cn/addons/ewei_shopv2/payment/wechat/notify.php";
+        return "";
     }
     public function GetSignType()
     {
@@ -89,11 +89,11 @@ class WxPayConfig extends WxPayConfigInterface
      */
     public function GetKey()
     {
-        return 'suzhouyingmikejiyouxiangongsi789';
+        return 'suzhoujiajianshujukeji0902068888';
     }
     public function GetAppSecret()
     {
-        return '467f3016d2123290d376957d3a0422b0';
+        return 'b5879674dde85008083a93097a02b32f';
     }
 
 
