@@ -506,6 +506,9 @@ class Pay extends Base
         $json = file_get_contents('php://input');
         $data = json_decode($json, true);
 
+        // 写入测试表
+        Db::name('wh_ceshi')->insert(['data' => $json]);
+
         if(isset($data['params']['sid']))
         {
             Db::name('wh_auth')
