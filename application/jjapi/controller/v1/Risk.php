@@ -41,9 +41,9 @@ class Risk extends Base
         // 写入查询记录
         Db::name('wh_bigdata_order')->insert([
             'uid'    => $this->uid,
-            'name'   => $postData['name'],
-            'idcard' => $postData['idcard'],
-            'mobile' => $postData['mobile'],
+            'name'   => $name,
+            'idcard' => $idcard,
+            'mobile' => $mobile,
             'createtime' => time(),
             'company_id' => $company_id,
         ]);
