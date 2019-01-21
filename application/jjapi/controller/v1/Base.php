@@ -24,20 +24,25 @@ class Base extends Controller
      */
     public function _initialize()
     {
-        // $this->uid = 1;
-        if (Request::instance()->isPost())
-        {
-            
-            $this->uid = Token::getCurrentUid();
+        if($_SERVER['SERVER_NAME'] === 'jj.888.com')   // 测试环境 
+        {   
+            $this->uid = 1;
         }
-        else
+        else    // 生产环境
         {
-            echo json_encode([
-                'errcode' => 201,
-                'errmsg'  => 'illegal request',
-            ]);
-
-            die();
+            if (Request::instance()->isPost())
+            {
+                $this->uid = Token::getCurrentUid();
+            }
+            else
+            {
+                echo json_encode([
+                    'errcode' => 201,
+                    'errmsg'  => 'illegal request',
+                ]);
+    
+                die();
+            }
         }
     }
 

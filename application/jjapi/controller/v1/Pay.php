@@ -322,7 +322,7 @@ class Pay extends Base
             {
                 return json([
                     'errcode' => 200,
-                    'errmsg'  => '签约成功'
+                    'errmsg'  => $result['errmsg']
                 ]);
             }
             else
@@ -486,7 +486,7 @@ class Pay extends Base
         {
             return [
                 'errno' => 0,
-                'errmsg'=> '成功',
+                'errmsg'=> '短信发送成功，合同签署地址：'.$result['data']['url'],
             ];
         }
         else
