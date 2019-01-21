@@ -24,30 +24,24 @@ class Base extends Controller
      */
     public function _initialize()
     {
-        if($_SERVER['SERVER_NAME'] === 'jj.888.com')   // 测试环境 
+        if($_SERVER['SERVER_NAME'] === 'jj.888.com')    // 测试环境 
         {   
             $this->uid = 1;
         }
-        else    // 生产环境
+        else                                            // 生产环境
         {
-            $action = Request::instance()->action();
-
-            // 排除上上签异步通知请求验证
-            if($action !== 'notify')
+            if(Request::instance()->isPost())
             {
-                if(Request::instance()->isPost())
-                {
-                    $this->uid = Token::getCurrentUid();
-                }
-                else
-                {
-                    echo json_encode([
-                        'errcode' => 201,
-                        'errmsg'  => 'illegal request',
-                    ]);
-        
-                    die();
-                }
+                $this->uid = Token::getCurrentUid();
+            }
+            else
+            {
+                echo json_encode([
+                    'errcode' => 201,
+                    'errmsg'  => 'illegal request',
+                ]);
+    
+                die();
             }
         }
     }

@@ -15,7 +15,6 @@ use think\Db;
 use app\jjapi\model\Auth;
 use app\lib\exception\UserException;
 
-// 生产环境下 此处应验证token等 是否登录
 class Pay extends Base
 {
     private $merno  = '168885';     // 商户号
@@ -464,7 +463,7 @@ class Pay extends Base
                     'y'       => '0.6',
                 ],
             ],
-            'pushUrl' => 'http://jj.5d1.top/jjapi/v1/pay/notify',
+            'pushUrl' => 'http://jj.5d1.top/jjapi/v1/notify/protocol',
             // 'returnUrl'     => 'https://www.baidu.com',
         ]);
 
@@ -497,30 +496,6 @@ class Pay extends Base
             ];
         }
     }
-
-    /**
-     * 上上签协议异步回调业务逻辑
-     */
-    public function notify()
-    {
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-
-        // 写入测试表
-        Db::name('wh_ceshi')->insert(['data' => $json]);
-
-        if(isset($data['params']['sid']))
-        {
-            Db::name('wh_auth')
-                ->where([
-                    'sid' => $data['params']['sid'],
-                ])
-                ->update([
-                    'status' => 1   // 更新为1,签约成功
-                ]);
-        }
-    }
-
 
 
     /**
@@ -627,7 +602,7 @@ class Pay extends Base
             'bankCode'  => $result['bank_code'],                                // 银行代码
             'payType'   => $result['pay_type'],                                 // 校验渠道 固定：XYPAY
             'cardType'  => 1,                                                   // 卡类型（1.借记卡 2.贷记卡）
-            'NotifyURL' => Config::get('notify_url'),                           // 异步通知地址(选填)
+            'NotifyURL' => 'http://jj.5d1.top/jjapi/v1/notify/epay',            // 异步通知地址(选填)
             'transDate' => date('Ymd'),                                         // 交易日期
             'transTime' => date('His'),                                         // 交易时间
             // 'purpose'   => '测试',                                               // 商户备注(选填)
@@ -729,7 +704,7 @@ class Pay extends Base
                 'payAmount' => (int)$result['price'] / 100,                         // 交易金额（单位元，小数保留2位）
                 'bankCode'  => $result['bank_code'],                                // 银行代码
                 'payType'   => 'XYPAY',                                             // 校验渠道 固定：XYPAY
-                'NotifyURL' => Config::get('notify_url'),                           // 异步通知地址(选填)
+                'NotifyURL' => 'http://jj.5d1.top/jjapi/v1/notify/epay',            // 异步通知地址(选填)
                 'txnTime'   => $txnTime,                                            // 交易时间
                 'smsCode'   => $smsCode,                                            // 短信验证码
             ];
@@ -760,72 +735,6 @@ class Pay extends Base
             return json(json_decode($result, true));
         }
 
-    }
-
-    /**
-     * 双乾支付异步回调通知（更新订单）
-     */
-    public function trans_notify()
-    {
-        $postData = Request::instance()->post();
-
-        if(isset($postData['BillNo']))
-        {
-            // 查询订单
-            $result = Db::name('wh_pay_order')
-                    ->where([
-                        'order_no' => $postData['BillNo'],
-                    ])
-                    ->find();
-            
-            if(empty($result))
-            {
-                // 订单不存在 日志业务逻辑...
-
-                return false;
-            }
-
-            // 查询企业识别码
-            $userinfo = Db::name('wh_user')
-                    ->where('id', $result['uid'])
-                    ->find();
-
-            if(empty($userinfo))
-            {
-                // 企业不存在 异常日志业务逻辑...
-                return false;
-            }
-
-            // 启动事务
-            Db::startTrans();
-
-            try{
-                Db::name('wh_pay_order')
-                    ->where([
-                        'order_no' => $postData['BillNo'],
-                    ])
-                    ->update([
-                        'status' => 1 // 更新支付订单状态 1为成功
-                    ]);
-
-                Db::name('admin')
-                    ->where([
-                        'id' => $userinfo['company_id'],
-                        'id_code' => $userinfo['company_code']
-                    ])
-                    ->setInc('pay_surplus', (int)$result['price'] / 100); // 企业帐户余额同步加
-
-                // 事务提交
-                Db::commit(); 
-            } 
-            catch (\Exception $e) 
-            {
-                // 事务回滚
-                Db::rollback();
-
-                // 更新失败 日志处理...
-            }
-        }
     }
 
     /**

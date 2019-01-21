@@ -375,8 +375,7 @@ class Account extends Base{
                     'y'       => '0.7',
                 ],
             ],
-            'pushUrl' => 'http://jj.5d1.top/jjapi/v1/account/notify',
-            // 'returnUrl'     => 'https://www.baidu.com',
+            'pushUrl' => 'http://jj.5d1.top/jjapi/v1/notify/contract',
         ]);
 
         $result = json_decode($response, true);
@@ -387,7 +386,6 @@ class Account extends Base{
         }
 
         
-
         // 发送短信
         $content = '[加减数据]尊敬的客户，您有一份待签署的外包服务协议，地址如下：' . $result['data']['url'];
 
@@ -406,26 +404,6 @@ class Account extends Base{
                 'errno' => 204,
                 'errmsg'=> $res,
             ];
-        }
-    }
-
-    /**
-     * 上上签协议异步回调业务逻辑
-     */
-    public function notify()
-    {
-        $json = file_get_contents('php://input');
-        $data = json_decode($json, true);
-
-        if(isset($data['params']['sid']))
-        {
-            Db::name('wh_contract')
-                ->where([
-                    'sid' => $data['params']['sid'],
-                ])
-                ->update([
-                    'status' => 1   // 更新为1,签约成功
-                ]);
         }
     }
 }
