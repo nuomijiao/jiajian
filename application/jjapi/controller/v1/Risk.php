@@ -50,17 +50,20 @@ class Risk extends Base
             // =================================== 精英 =====================================
 
             $table = 'wh_user';
+
+            // 精英帐户 ID
+            $account_id = $data['id'];
         }
         else    
         {
             // ==================================== 企业 ====================================
 
-            // 企业ID
-            $company_id = $data['company_id'];
+            // 企业帐户 ID
+            $account_id = $data['company_id'];
 
             $data = Db::name('admin')
                 ->where([
-                    'id' => $company_id
+                    'id' => $account_id
                 ])
                 ->find(); 
 
@@ -93,7 +96,7 @@ class Risk extends Base
         try{
             // 更新余额
             Db::name($table)
-                ->where('id', $company_id)
+                ->where('id', $account_id)
                 ->setDec('surplus', 9.9);
 
             // 查询记录入库
@@ -103,7 +106,7 @@ class Risk extends Base
                 'idcard' => $idcard,
                 'mobile' => $mobile,
                 'createtime' => time(),
-                'company_id' => $company_id,
+                'company_id' => $account_id,    // 注：此ID 可能为企业ID 或 精英ID
             ]);
 
             // 事务提交
