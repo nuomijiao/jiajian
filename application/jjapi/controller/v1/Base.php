@@ -19,9 +19,7 @@ use app\lib\exception\UserException;
 // 生产环境下 此处应验证token等 是否登录
 class Base extends Controller
 {
-    /**
-     * 基础过滤器
-     */
+    // 基础过滤器
     public function _initialize()
     {
         if($_SERVER['SERVER_NAME'] === 'jj.888.com')    // 测试环境 
