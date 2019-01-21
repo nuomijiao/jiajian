@@ -77,7 +77,7 @@ Route::get('api/:version/balancedetail', 'jjapi/:version.User/getBalanceDetail')
 //支付宝回调
 Route::post('api/:version/alipaynotify', 'jjapi/:version.Recharge/alipayNotify');
 //微信回调
-Route::post('api/:version/wxpaynotify', 'jjapi/:verison.Recharge/wxpayNotify');
+Route::post('api/:version/wxpaynotify', 'jjapi/:version.Recharge/wxpayNotify');
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
