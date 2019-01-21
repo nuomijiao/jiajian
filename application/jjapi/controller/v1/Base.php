@@ -16,7 +16,6 @@ use app\jjapi\service\Token;
 use app\jjapi\model\Auth;
 use app\lib\exception\UserException;
 
-// 生产环境下 此处应验证token等 是否登录
 class Base extends Controller
 {
     // 基础过滤器
