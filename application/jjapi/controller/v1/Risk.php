@@ -48,6 +48,32 @@ class Risk extends Base
             'company_id' => $company_id,
         ]);
 
+        // 数据验证
+        $data = Db::name('admin')
+            ->where([
+                // 'role_id' => 6,
+                'id' => $company_id
+            ])
+            ->find();
+
+        // 验证所在企业
+        if(empty($data))
+        {
+            return json([
+                'errcode' => 202,
+                'errmsg'  => '没有查询到所在企业相关信息'
+            ]);
+        }
+
+        // 验证余额
+        if((float)data['surplus'] < 9.9)
+        {
+            return json([
+                'errcode' => 202,
+                'errmsg'  => '余额不足'
+            ]);
+        }
+
         // 更新余额
         Db::name('admin')
             ->where('id', $company_id)
