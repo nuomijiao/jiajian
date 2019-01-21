@@ -106,7 +106,7 @@ class Risk extends Base
                 'idcard' => $idcard,
                 'mobile' => $mobile,
                 'createtime' => time(),
-                'company_id' => $account_id,    // 注：此ID 可能为企业ID 或 精英ID
+                'account_id' => $account_id,    // 注：此ID 可能为企业ID 或 精英ID
             ]);
 
             // 事务提交
