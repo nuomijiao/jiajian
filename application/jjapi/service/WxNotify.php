@@ -23,7 +23,7 @@ class WxNotify extends \WxPayNotify
         if ($data['result_code'] == 'SUCCESS') {
             $orderNo = $data['out_trade_no'];
 
-            $attach = $data['attach'];
+//            $attach = $data['attach'];
 
             $order = WhRechargeOrder::getOrderByOrdersn($orderNo);
 
