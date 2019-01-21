@@ -48,6 +48,11 @@ class Risk extends Base
             'company_id' => $company_id,
         ]);
 
+        // 更新余额
+        Db::name('admin')
+            ->where('id', $company_id)
+            ->setDec('surplus', 9.9);
+
         // 请求接口
         $json = [
             'name'   => $name,
