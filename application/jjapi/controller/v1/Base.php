@@ -30,18 +30,24 @@ class Base extends Controller
         }
         else    // 生产环境
         {
-            if (Request::instance()->isPost())
+            $action = Request::instance()->action();
+
+            // 排除上上签异步通知请求验证
+            if($action !== 'notify')
             {
-                $this->uid = Token::getCurrentUid();
-            }
-            else
-            {
-                echo json_encode([
-                    'errcode' => 201,
-                    'errmsg'  => 'illegal request',
-                ]);
-    
-                die();
+                if(Request::instance()->isPost())
+                {
+                    $this->uid = Token::getCurrentUid();
+                }
+                else
+                {
+                    echo json_encode([
+                        'errcode' => 201,
+                        'errmsg'  => 'illegal request',
+                    ]);
+        
+                    die();
+                }
             }
         }
     }
