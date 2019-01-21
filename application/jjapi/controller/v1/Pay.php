@@ -570,7 +570,7 @@ class Pay extends Base
         $phone = Request::instance()->param('phone');
 
         // 扣款金额
-        $price = (int)Request::instance()->param('price');
+        $price = (float)Request::instance()->param('price');
 
         // 验证是否签约
         $result = Db::name('wh_auth')
@@ -612,7 +612,7 @@ class Pay extends Base
         }
         
         // 分期数
-        $stages = (int)$result['stages'];
+        // $stages = (int)$result['stages'];
 
         // 支付请求数据
         $postData = [   
@@ -622,8 +622,8 @@ class Pay extends Base
             'phone'     => $result['phone'],                                    // 手机号
             'idNo'      => $result['id_no'],                                    // 身份证
             'idType'    => 0,                                                   // 证件类型（0.身份证）
-            'payAmount' => $stagesArr[0]['price'],                              // 交易金额（单位元，小数保留2位）
-            'merOrderNo'=> $stagesArr[0]['order_no'],                           // 商户订单号
+            'payAmount' => $price,                                              // 交易金额（单位元，小数保留2位）
+            'merOrderNo'=> $merOrderNo,                                         // 商户订单号
             'bankCode'  => $result['bank_code'],                                // 银行代码
             'payType'   => $result['pay_type'],                                 // 校验渠道 固定：XYPAY
             'cardType'  => 1,                                                   // 卡类型（1.借记卡 2.贷记卡）
@@ -669,8 +669,8 @@ class Pay extends Base
             'price'     => $price * 100,
             'order_no'  => $merOrderNo,
             'createtime'=> time(),
-            'day'       => $day,
-            'status'    => $status,       // 1.成功 2.异常 3.分期
+            'day'       => date('Ymd'),
+            'status'    => 2,       // 1.成功 2.异常 3.分期
             'company_id'=> $company_id,
         ];
 
