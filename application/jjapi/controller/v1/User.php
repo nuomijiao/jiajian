@@ -100,9 +100,16 @@ class User extends BaseController
         }
         if (isset($pagingDetailList)) {
             if ($pagingDetailList->isEmpty()) {
-                throw new UserException([
+                return json([
                     'msg' => '明细已见底',
-                    'errorCode' => 30009,
+                    'error_code' => 30009,
+                    'surplus' => $surplus,
+                    'pay_surplus' => isset($pay_surplus) ? $pay_surplus : '',
+                    'econtract_surplus' => isset($econtract_surplus) ? $econtract_surplus : '',
+                    'deposit_surplus' => isset($deposit_surplus) ? $deposit_surplus : '',
+                    'degree' => $userInfo->degree,
+                    'status' => $userInfo->status,
+                    'is_main_user' => $userInfo->is_main_user,
                 ]);
             }
             $data = $pagingDetailList->toArray();
