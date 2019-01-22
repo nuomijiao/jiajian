@@ -35,9 +35,4 @@ class UserToken extends Token
         return $token;
     }
 
-    public function addBalanceDetail()
-    {
-
-    }
-
 }
