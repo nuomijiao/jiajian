@@ -339,7 +339,7 @@ class Pay extends Base
             {
                 return json([
                     'errcode' => 200,
-                    'errmsg'  => '认证成功，请签约！'
+                    'errmsg'  => $result['respMessage']
                 ]);
             }
             else
