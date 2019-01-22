@@ -13,14 +13,20 @@ use app\jjapi\controller\BaseController;
 use app\jjapi\model\Admin;
 use app\jjapi\model\WhBalanceDetail;
 use app\jjapi\model\WhUser;
+use app\jjapi\model\WhWithdraw;
 use app\jjapi\service\Picture;
 use app\jjapi\service\Token;
+use app\jjapi\validate\MoneyMustBePositiveInt;
 use app\jjapi\validate\PagingParameter;
 use app\jjapi\validate\UserInfo;
+use app\jjapi\validate\WithdrawType;
 use app\lib\enum\AccountApplyStatusEnum;
 use app\lib\enum\UserDegreeEnum;
 use app\lib\exception\SuccessMessage;
 use app\lib\exception\UserException;
+use think\Config;
+use think\Db;
+use think\Exception;
 
 class User extends BaseController
 {
@@ -117,25 +123,97 @@ class User extends BaseController
 
     }
 
-    //获取精英账户明细
-//    public function getAccountDetail()
-//    {
-//        $uid = Token::getCurrentUid();
-//        $userInfo = WhUser::get($uid);
-//        if (!(UserDegreeEnum::JingYing == $userInfo->degree && AccountApplyStatusEnum::Pass == $userInfo->status)) {
-//            throw new UserException([
-//                'msg' => '非精英账户没有权限',
-//                'errorCode' => 30008,
-//            ]);
-//        }
-//        return $this->jjreturn([
-//            'id' => $uid,
-//            'surplus' => $userInfo->surplus,
-//            'pay_surplus' => $userInfo->pay_surplus,
-//            'econtract_surplus' => $userInfo->econtract_surplus,
-//            'deposit_surplus' => $userInfo->deposit_surplus,
-//        ]);
-//    }
+
+    //精英账户提现信息
+    public function withdraw($page = 1, $size = 10, $type)
+    {
+        $request = (new WithdrawType())->goCheck();
+        $uid = Token::getCurrentUid();
+        $userInfo = WhUser::get($uid);
+        if (!(UserDegreeEnum::JingYing == $userInfo->degree && AccountApplyStatusEnum::Pass == $userInfo->status)) {
+            throw new UserException([
+                'msg' => '该账号没有权限',
+                'errorCode' => 30008,
+            ]);
+        }
+        $site = Config::get('site');
+        $weekMoney = Db::name('wh_withdraw')->whereTime('create_time', 'week')->where('status', ['=', 1], ['=', 2], 'or')->where(['user_id'=>$uid, 'type'=> UserDegreeEnum::JingYing])->sum('money');
+        $weekSurplus = $site['elite_weekly_withdraw_amount'] - $weekMoney;
+        $withdrawList = WhWithdraw::getWithdrawListByStatus($type);
+        if ($withdrawList->isEmpty()) {
+            throw new UserException([
+                'msg' => '明细已见底',
+                'errorCode' => 30009,
+            ]);
+        }
+        $data = $withdrawList->toArray();
+        return json([
+            'error_code' => 'Success',
+            'data' => $data,
+            'current_page' => $withdrawList->getCurrentPage(),
+            'elite_single_withdraw_max' => $site['elite_single_withdraw_max'],
+            'elite_weekly_withdraw_amount' => $site['elite_weekly_withdraw_amount'],
+            'elite_weekly_withdraw_surplus' => $weekSurplus,
+            'pay_surplus' => $userInfo->pay_surplus,
+            'wait_pay_surplus' => $userInfo->wait_pay_surplus,
+        ]);
+    }
+
+
+    public function applyWithdraw($money)
+    {
+        $request = (new MoneyMustBePositiveInt())->goCheck();
+        $uid = Token::getCurrentUid();
+        $userInfo = WhUser::get($uid);
+        $site = Config::get('site');
+        if (!(UserDegreeEnum::JingYing == $userInfo->degree && AccountApplyStatusEnum::Pass == $userInfo->status)) {
+            throw new UserException([
+                'msg' => '该账号没有权限',
+                'errorCode' => 30008,
+            ]);
+        }
+        if ($money > $userInfo->surplus) {
+            throw new UserException([
+                'msg' => '余额不足',
+                'errorCode' => 30009,
+            ]);
+        }
+        if ($money > $site['elite_single_withdraw_max']) {
+            throw new UserException([
+                'msg' => '超过单笔提现金额最大值',
+                'errorCode' => 30010,
+            ]);
+        }
+        $weekMoney = Db::name('wh_withdraw')->whereTime('create_time', 'week')->where('status', ['=', 1], ['=', 2], 'or')->where(['user_id'=>$uid, 'type'=> UserDegreeEnum::JingYing])->sum('money');
+        $weekSurplus = $site['elite_weekly_withdraw_amount'] - $weekMoney;
+        if ($money > $weekSurplus) {
+            throw new UserException([
+                'msg' => '超过本周剩余提现额度',
+                'errorCode' => 30011,
+            ]);
+        }
+        Db::startTrans();
+        try {
+            Db::name('wh_user')->where(['id' => $uid, 'degree' => UserDegreeEnum::JingYing])->dec('pay_surplus', $money)->inc('wait_pay_surplus', $money)->update();
+            WhWithdraw::create([
+                'user_id' => $uid,
+                'money' => $money,
+                'type' => UserDegreeEnum::JingYing,
+            ]);
+            Db::commit();
+        } catch(Exception $ex) {
+            Db::rollback();
+            throw $ex;
+        }
+
+        throw new SuccessMessage([
+            'msg' => '申请提现成功',
+        ]);
+
+
+    }
+
+
 
 
 

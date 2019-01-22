@@ -60,7 +60,10 @@ Route::get('api/:version/getuserinfo', 'jjapi/:version.User/getUserInfo');
 Route::post('api/:version/modifyheadimg', 'jjapi/:version.User/modifyHeadImg');
 //修改信息
 Route::post('api/:version/saveinfo', 'jjapi/:version.User/saveInfo');
-
+//提现详情
+Route::get('api/:version/withdraw', 'jjapi/:version.User/withdraw');
+//申请提现
+Route::post('api/:version/applywithdraw', 'jjapi/:version.User/applyWithdraw');
 
 
 //申请精英上传图片
@@ -78,6 +81,9 @@ Route::get('api/:version/balancedetail', 'jjapi/:version.User/getBalanceDetail')
 Route::post('api/:version/alipaynotify', 'jjapi/:version.Recharge/alipayNotify');
 //微信回调
 Route::post('api/:version/wxpaynotify', 'jjapi/:version.Recharge/wxpayNotify');
+
+
+
 
 //获取省市区
 Route::get('api/:version/getprovince', 'jjapi/:version.City/getProvince');
