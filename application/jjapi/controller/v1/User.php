@@ -125,7 +125,7 @@ class User extends BaseController
 
 
     //精英账户提现信息
-    public function withdraw($page = 1, $size = 10, $type)
+    public function withdraw($page = 1, $size = 10, $type = '')
     {
         $request = (new WithdrawType())->goCheck();
         $uid = Token::getCurrentUid();
@@ -160,7 +160,7 @@ class User extends BaseController
     }
 
 
-    public function applyWithdraw($money)
+    public function applyWithdraw($money = '')
     {
         $request = (new MoneyMustBePositiveInt())->goCheck();
         $uid = Token::getCurrentUid();
