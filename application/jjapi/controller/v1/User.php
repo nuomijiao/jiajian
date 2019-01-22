@@ -184,7 +184,7 @@ class User extends BaseController
                 'errorCode' => 30008,
             ]);
         }
-        if ($money > $userInfo->surplus) {
+        if ($money > $userInfo->pay_surplus) {
             throw new UserException([
                 'msg' => '余额不足',
                 'errorCode' => 30010,
