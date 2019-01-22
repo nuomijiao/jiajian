@@ -22,4 +22,8 @@ class Admin extends BaseModel
     {
         return self::where(['user_id'=>$uid, 'role_id'=>RoleEnum::Company])->find();
     }
+
+    public static function getCompanyById($id) {
+        return self::where(['id'=>$id, 'role_id'=>RoleEnum::Company])->find();
+    }
 }
