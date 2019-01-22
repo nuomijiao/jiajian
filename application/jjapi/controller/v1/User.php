@@ -139,7 +139,7 @@ class User extends BaseController
         $site = Config::get('site');
         $weekMoney = Db::name('wh_withdraw')->whereTime('create_time', 'week')->where('status', ['=', 1], ['=', 2], 'or')->where(['user_id'=>$uid, 'type'=> UserDegreeEnum::JingYing])->sum('money');
         $weekSurplus = $site['elite_weekly_withdraw_amount'] - $weekMoney;
-        $withdrawList = WhWithdraw::getWithdrawListByStatus($type);
+        $withdrawList = WhWithdraw::getWithdrawListByStatus($uid, $page, $size, $type);
         if ($withdrawList->isEmpty()) {
             throw new UserException([
                 'msg' => '明细已见底',
