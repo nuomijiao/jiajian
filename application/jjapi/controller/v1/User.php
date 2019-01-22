@@ -187,13 +187,13 @@ class User extends BaseController
         if ($money > $userInfo->surplus) {
             throw new UserException([
                 'msg' => '余额不足',
-                'errorCode' => 30009,
+                'errorCode' => 30010,
             ]);
         }
         if ($money > $site['elite_single_withdraw_max']) {
             throw new UserException([
                 'msg' => '超过单笔提现金额最大值',
-                'errorCode' => 30010,
+                'errorCode' => 30011,
             ]);
         }
         $weekMoney = Db::name('wh_withdraw')->whereTime('create_time', 'week')->where('status', ['=', 1], ['=', 2], 'or')->where(['user_id'=>$uid, 'type'=> UserDegreeEnum::JingYing])->sum('money');
@@ -201,7 +201,7 @@ class User extends BaseController
         if ($money > $weekSurplus) {
             throw new UserException([
                 'msg' => '超过本周剩余提现额度',
-                'errorCode' => 30011,
+                'errorCode' => 30012,
             ]);
         }
         Db::startTrans();
