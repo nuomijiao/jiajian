@@ -76,7 +76,8 @@ class Pay extends Base
 
         $postData   = Request::instance()->post();
         $type       = @$postData['type'];
-        $stages     = (int)$postData['stages'];                                     // 分期数
+        $stages     = @$postData['stages'];                                     // 分期数
+        $stages     = (int)$stages;
         $payMoney   = @$postData['payMoney'];                                   // 预计扣款金
         $paths      = @$postData['paths'];                                      // 身份证等图片路径
 
