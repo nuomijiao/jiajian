@@ -141,9 +141,14 @@ class User extends BaseController
         $weekSurplus = $site['elite_weekly_withdraw_amount'] - $weekMoney;
         $withdrawList = WhWithdraw::getWithdrawListByStatus($uid, $page, $size, $type);
         if ($withdrawList->isEmpty()) {
-            throw new UserException([
+            return json([
                 'msg' => '明细已见底',
-                'errorCode' => 30009,
+                'error_code' => 30009,
+                'elite_single_withdraw_max' => $site['elite_single_withdraw_max'],
+                'elite_weekly_withdraw_amount' => $site['elite_weekly_withdraw_amount'],
+                'elite_weekly_withdraw_surplus' => $weekSurplus,
+                'pay_surplus' => $userInfo->pay_surplus,
+                'wait_pay_surplus' => $userInfo->wait_pay_surplus,
             ]);
         }
         $data = $withdrawList->toArray();
