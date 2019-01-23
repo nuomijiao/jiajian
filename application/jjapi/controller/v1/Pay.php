@@ -68,7 +68,7 @@ class Pay extends Base
         //     'cardNo'   => '6227002006600280380',
         //     'bankCode' => '建设银行',
         //     'idNo'     => '342221199110018230',
-        //     'authMsg'  => '875402',
+        //     'authMsg'  => '900393',
         //     'custType' => '02',
         //     'type'     => 1,
         //     'stages'   => 33,
@@ -144,7 +144,6 @@ class Pay extends Base
         $result = json_decode($result, true);
 
         // v($result);
-        $result['respCode'] = 'success';
 
         // 如果为签约则写入数据库
         if($result['respCode'] === 'success' && $postData['custType'] === '02')
@@ -479,25 +478,51 @@ class Pay extends Base
 
         // v($result);
 
-        // 发送短信
-        $content = '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];
+        // 发送短信(1
+        $response = $bestSign->apiPost('/notice/send/', [
+            'bizType' => 'sign',
+            'channel' => 'sms',
+            'target'  => $data['phoneNo'],
+            'content' => [
+                'shortUrl' => $result['data']['url']
+            ],
+        ]);
+        $result = json_decode($response, true);
 
-        $res = Base::sendSmsCode($data['phoneNo'], $content);
-
-        if($res === 'ok')
+        if($result['errno'] == 0)
         {
             return [
                 'errno' => 0,
-                'errmsg'=> '短信发送成功，合同签署地址：'.$result['data']['url'],
+                'errmsg'=> '发送成功，请尽快签署合同。'
             ];
         }
         else
         {
             return [
                 'errno' => 204,
-                'errmsg'=> $res,
+                'errmsg'=> $result['errmsg'],
             ];
         }
+
+        // 发送短信(2
+        // $content = '[加减数据]尊敬的客户，您有一份待签署的代扣合同，地址如下：' . $result['data']['url'];
+
+        // $res = Base::sendSmsCode($data['phoneNo'], $content);
+
+        // if($res === 'ok')
+        // {
+        //     return [
+        //         'errno' => 0,
+        //         'errmsg'=> '短信发送成功，合同签署地址：'.$result['data']['url'],
+        //     ];
+        // }
+        // else
+        // {
+        //     return [
+        //         'errno' => 204,
+        //         'errmsg'=> $res,
+        //     ];
+        // }
     }
 
 

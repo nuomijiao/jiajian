@@ -380,30 +380,57 @@ class Account extends Base{
 
         $result = json_decode($response, true);
         // v($result);
+
         if($result['errno'] != 0)
         {
             return $result;
         }
 
-        
-        // 发送短信
-        $content = '[加减数据]尊敬的客户，您有一份待签署的外包服务协议，地址如下：' . $result['data']['url'];
 
-        $res = Base::sendSmsCode($data['phoneNo'], $content);
+        // 发送短信(1
+        $response = $bestSign->apiPost('/notice/send/', [
+            'bizType' => 'sign',
+            'channel' => 'sms',
+            'target'  => $data['phoneNo'],
+            'content' => [
+                'shortUrl' => $result['data']['url']
+            ],
+        ]);
+        $result = json_decode($response, true);
 
-        if($res === 'ok')
+        if($result['errno'] == 0)
         {
             return [
                 'errno' => 0,
-                'errmsg'=> '成功',
+                'errmsg'=> '发送成功，请尽快签署合同。'
             ];
         }
         else
         {
             return [
                 'errno' => 204,
-                'errmsg'=> $res,
+                'errmsg'=> $result['errmsg'],
             ];
         }
+        
+        // 发送短信(2
+        // $content = '[加减数据]尊敬的客户，您有一份待签署的外包服务协议，地址如下：' . $result['data']['url'];
+
+        // $res = Base::sendSmsCode($data['phoneNo'], $content);
+
+        // if($res === 'ok')
+        // {
+        //     return [
+        //         'errno' => 0,
+        //         'errmsg'=> '成功',
+        //     ];
+        // }
+        // else
+        // {
+        //     return [
+        //         'errno' => 204,
+        //         'errmsg'=> $res,
+        //     ];
+        // }
     }
 }
