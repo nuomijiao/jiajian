@@ -35,6 +35,7 @@ class Pay extends Base
         // 总记录数
         $num = Db::name('wh_auth')
             ->where([
+                'uid' => $this->uid,
                 'status' => 1
             ])
             ->count();
@@ -42,6 +43,7 @@ class Pay extends Base
         // 单页条数
         $data = Db::name('wh_auth')
             ->where([
+                'uid' => $this->uid,
                 'status' => 1
             ])
             ->limit($pageSize * $size, $size)
