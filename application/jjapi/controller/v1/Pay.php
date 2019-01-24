@@ -17,7 +17,7 @@ use app\lib\exception\UserException;
 
 class Pay extends Base
 {
-    private $merno  = '168885';     // 商户号
+    private $merno  = '203163';     // 商户号
     private $MD5key = "12345678";   // MD5key
 
     /**
@@ -28,6 +28,9 @@ class Pay extends Base
         // 显示记录数
         $size = Request::instance()->param('size', 10);
 
+        // 状态(1.成功 2.异常)
+        $status = Request::instance()->param('status', 10);
+
         // 页码
         $pageSize = Request::instance()->param('pageSize', 1);
         $pageSize = (int)$pageSize - 1;
@@ -36,7 +39,7 @@ class Pay extends Base
         $num = Db::name('wh_auth')
             ->where([
                 'uid' => $this->uid,
-                'status' => 1
+                'status' => $status
             ])
             ->count();
 
@@ -44,7 +47,7 @@ class Pay extends Base
         $data = Db::name('wh_auth')
             ->where([
                 'uid' => $this->uid,
-                'status' => 1
+                'status' => $status
             ])
             ->limit($pageSize * $size, $size)
             ->select();
