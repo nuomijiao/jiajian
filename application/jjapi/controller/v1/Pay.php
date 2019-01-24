@@ -18,7 +18,7 @@ use app\lib\exception\UserException;
 class Pay extends Base
 {
     private $merno  = '203163';     // 商户号
-    private $MD5key = "12345678";   // MD5key
+    private $MD5key = "]BLw}Bbk";   // MD5key
 
     /**
      * 签约列表

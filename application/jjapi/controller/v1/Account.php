@@ -16,6 +16,9 @@ use app\lib\exception\UserException;
 
 class Account extends Base{
 
+    private $merno  = '203163';     // 商户号
+    private $MD5key = "]BLw}Bbk";   // MD5key
+
     /**
      * 电子合同查询
      */
@@ -66,7 +69,7 @@ class Account extends Base{
         $time = time();
 
         // 发送短信验证码
-        $bool = Base::sendSmsCode($phone, '[加减数据]验证码：' . $code . '，5分钟内有效。');
+        $bool = sendSmsCode($phone, '[加减数据]验证码：' . $code . '，5分钟内有效。');
 
         // 缓存验证码
         $pool = Db::name('wh_smscode')->insert([
@@ -93,6 +96,34 @@ class Account extends Base{
         }
 
         return $json;
+    }
+
+    /**
+     * 身份证认证
+     */
+    private function idCardAuth($name, $idcard)
+    {
+        $postData = [
+            'merNo'     => $this->merno,
+            'reqMsgId'  => time(),
+            'custName'  => $name,
+            'idType'    => 0,
+            'idNo'      => $idcard,
+            'photoType' => 0,
+        ];
+
+        $joinMapValue = joinMapValue($postData);
+        $strBeforeMd5 = $joinMapValue . strtoupper(md5($this->MD5key));
+        $postData['MD5Info'] = strtoupper(md5($strBeforeMd5));
+
+        // v($postData);
+
+        $result = curlPost('https://realname.95epay.cn/pay/identityAuthentication.action', $postData);
+        $result = json_decode($result, true);
+
+        // v($result);
+
+        return $result['respCode'] == 'success' ? true : false;
     }
 
     /**
@@ -129,6 +160,15 @@ class Account extends Base{
             return json([
                 'errcode' => 204,
                 'errmsg'  => '手机验证码已经过期',
+            ]); 
+        }
+
+        // 身份证认证
+        if(!$this->idCardAuth($postData['name'], $postData['idno']))
+        {
+            return json([
+                'errcode' => 204,
+                'errmsg'  => '身份证校验失败',
             ]); 
         }
 
