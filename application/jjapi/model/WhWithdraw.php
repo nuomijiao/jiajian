@@ -25,4 +25,9 @@ class WhWithdraw extends BaseModel
     {
         return self::where(['user_id'=>$uid, 'type'=> UserDegreeEnum::JingYing, 'status' => $type])->order('create_time', 'desc')->paginate($size, true, ['page' => $page]);
     }
+
+    public static function checkOrderByOrderSn($ordersn)
+    {
+        return self::where('order_sn', '=', $ordersn)->find();
+    }
 }

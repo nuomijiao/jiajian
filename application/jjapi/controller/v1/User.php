@@ -27,6 +27,9 @@ use app\lib\exception\UserException;
 use think\Config;
 use think\Db;
 use think\Exception;
+use think\Loader;
+
+Loader::import('shuangqian.NumberPaidSingleJiao', EXTEND_PATH, '.php');
 
 class User extends BaseController
 {
@@ -206,12 +209,37 @@ class User extends BaseController
         }
         Db::startTrans();
         try {
-            Db::name('wh_user')->where(['id' => $uid, 'degree' => UserDegreeEnum::JingYing])->dec('pay_surplus', $money)->inc('wait_pay_surplus', $money)->update();
-            WhWithdraw::create([
+
+            $order = WhWithdraw::create([
                 'user_id' => $uid,
                 'money' => $money,
                 'type' => UserDegreeEnum::JingYing,
+                'order_sn' => self::makeOrderNo(),
+                'open_bank_name' => $userInfo->open_bank_name,
+                'shuangqian_bank_code' => $userInfo->shuangqian_bank_code,
+                'bank_card_code' => $userInfo->bank_card_code,
+                'bank_card_type' => 1,
             ]);
+            $singPay = new \Paid($order);
+            $result = $singPay->singlePaid();
+            //提交双乾代付接口
+            if ($result == 'success') {
+                Db::name('wh_user')->where(['id' => $uid, 'degree' => UserDegreeEnum::JingYing])->dec('pay_surplus', $money)->inc('wait_pay_surplus', $money)->update();
+                WhWithdraw::update([
+                    'id' => $order->id,
+                    'shuangqian_status' => 1,
+                ]);
+                $msg = '提现申请成功';
+
+            } else {
+                WhWithdraw::update([
+                    'id' => $order->id,
+                    'shuangqian_status' => 2,
+                    'status' => 3,
+                    'fail_reason' => '异常',
+                ]);
+                $msg = '提现申请异常';
+            }
             Db::commit();
         } catch(Exception $ex) {
             Db::rollback();
@@ -219,13 +247,26 @@ class User extends BaseController
         }
 
         throw new SuccessMessage([
-            'msg' => '申请提现成功',
+            'msg' => $msg,
         ]);
 
 
     }
 
+    private static function makeOrderNo()
+    {
+        $yCode = array('A', 'B', 'C', 'E', 'F','H', 'K', 'M', 'N', 'R');
 
+        $orderSn = $yCode[intval(date('Y')) - 2018] . strtoupper(dechex(date('m'))) . date(
+                'd') . substr(time(), -5) . substr(microtime(), 2, 5) . sprintf(
+                '%02d', rand(0, 99));
+        $order = WhWithdraw::checkOrderByOrderSn($orderSn);
+        if ($order) {
+            return self::makeOrderNo();
+        } else {
+            return $orderSn;
+        }
+    }
 
 
 
