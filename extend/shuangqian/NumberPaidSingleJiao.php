@@ -44,7 +44,7 @@ class Paid
         $postData = [
             "merno" => $this->rsa->getMerno(),
             "time" => $this->time,
-            "content" => $this->open_bank_name."|".$this->shuangqian_bank_code."|".$this->bank_card_code."|".$this->bank_card_type."|".$this->order->money."|000|".$this->remark,
+            "content" => $this->open_bank_name."|".$this->shuangqian_bank_code."|".$this->bank_card_code."|".$this->bank_card_type."|".$this->order->money."|".$this->order->order_sn."|000|".$this->remark,
         ];
 
         $beforeSignedData = $this->joinMapValue($postData);
