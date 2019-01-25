@@ -156,3 +156,37 @@ function toUnderScore($str)
 
     return trim(preg_replace('/_{2,}/','_', $dstr), '_');
 }
+
+/**
+ * sendSmsCode 验证码
+ * @param $phone    手机号
+ * @param $content  内容
+ */
+function sendSmsCode($phone, $content)
+{
+    // 代码标题
+    $statusStr = [
+        "0" => "短信发送成功[短信宝]",
+        "-1" => "参数不全[短信宝]",
+        "-2" => "短信宝服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！[短信宝]",
+        "30" => "密码错误[短信宝]",
+        "40" => "账号不存在[短信宝]",
+        "41" => "余额不足[短信宝]",
+        "42" => "帐户已过期[短信宝]",
+        "43" => "IP地址限制[短信宝]",
+        "50" => "内容含有敏感词[短信宝]"
+    ];
+
+    $smsData = [
+        'u' => 'jiajian',               // 帐户
+        'p' => md5('jiajian2019'),       // 密码
+        'm' => $phone,                  // 手机号
+        'c' => $content,                // 内容
+    ];
+
+    $param  = http_build_query($smsData);
+    $smsApi = 'http://api.smsbao.com/sms?' . $param;
+    $result = file_get_contents($smsApi);
+
+    return $result == 0 ? 'ok' : $statusStr[$result];
+}
