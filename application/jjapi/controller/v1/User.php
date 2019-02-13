@@ -121,7 +121,7 @@ class User extends BaseController
         return json([
             'error_code' => 'Success',
             'data' => isset($data) ? $data : '',
-            'current_page' => $pagingDetailList->getCurrentPage(),
+            'current_page' => isset($pagingDetailList) ? $pagingDetailList->getCurrentPage() : '',
             'surplus' => $surplus,
             'pay_surplus' => isset($pay_surplus) ? $pay_surplus : '',
             'econtract_surplus' => isset($econtract_surplus) ? $econtract_surplus : '',
@@ -267,6 +267,7 @@ class User extends BaseController
             return $orderSn;
         }
     }
+
 
 
 
