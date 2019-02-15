@@ -28,6 +28,9 @@ class Pay extends Base
         // 显示记录数
         $size = Request::instance()->param('size', 10);
 
+        // 类型
+        $type = Request::instance()->param('type', 1);
+
         // 状态(1.成功 2.异常)
         $status = Request::instance()->param('status', 10);
 
@@ -38,6 +41,7 @@ class Pay extends Base
         // 总记录数
         $num = Db::name('wh_auth')
             ->where([
+                'type'=> $type,
                 'uid' => $this->uid,
                 'status' => $status
             ])
@@ -46,6 +50,7 @@ class Pay extends Base
         // 单页条数
         $data = Db::name('wh_auth')
             ->where([
+                'type'=> $type,
                 'uid' => $this->uid,
                 'status' => $status
             ])
@@ -563,15 +568,14 @@ class Pay extends Base
      */
     public function consume()
     {
-        // 手机号
+        $id    = Request::instance()->param('id');
         $phone = Request::instance()->param('phone');
-
-        // 扣款金额
         $price = (float)Request::instance()->param('price');
 
         // 验证是否签约
         $result = Db::name('wh_auth')
                 ->where([
+                    'id'    => $id,
                     'phone' => $phone,
                     'status'=> 1        // 1为签约成功 2为失败
                 ])
