@@ -70,26 +70,11 @@ class Pay extends Base
     // ========================================= 双乾快捷支付 =========================================
 
 
-
     /**
      * 认证/签约接口
      */
     public function auth()
     {  
-        // $_POST = [
-        //     'custName' => '汪高启',
-        //     'phoneNo'  => '13285177013',
-        //     'cardNo'   => '6227002006600280380',
-        //     'bankCode' => '建设银行',
-        //     'idNo'     => '342221199110018230',
-        //     'authMsg'  => '900393',
-        //     'custType' => '02',
-        //     'type'     => 1,
-        //     'stages'   => 33,
-        //     'payMoney' => 100,
-        //     'paths'    => '1.jpg',
-        // ];
-
         $postData   = Request::instance()->post();
         $type       = @$postData['type'];
         $stages     = @$postData['stages'];                                     // 分期数
@@ -372,11 +357,6 @@ class Pay extends Base
      */
     private function shangShangQian($data, $elements)
     {
-        // $idNo = '343221199103201230';
-        // $account = '15666589065';
-        // $name    = '黄斌';
-        // $sid = mt_rand(10000, 99999) . time();
-
         $developerId = '1546398307015021788';
         $pem = file_get_contents(ROOT_PATH . 'rsakey/shangshangqian_rsa_private_key.pem');
         $server_host = 'https://openapi.bestsign.info/openapi/v2';
@@ -844,19 +824,6 @@ class Pay extends Base
      */
     public function agentpay()
     {  
-        $_POST = [
-  
-            'custName' => '汪高启',
-            'cardNo'   => '6227002006600280380',
-            'phoneNo'  => '13285177013',
-            'idNo'     => '342221199110018230',
-            'bankCode' => '建设银行',
-
-            'stages'   => 33,
-            'payMoney' => 100,
-            'paths'    => '1.jpg',
-        ];
-
         $postData   = Request::instance()->post();
 
         $stages     = (int)$postData['stages'];                                 // 分期数
