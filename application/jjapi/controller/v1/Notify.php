@@ -108,23 +108,23 @@ class Notify extends Controller{
                 return false;
             }
 
-            // 签名校验
-            $authMsgData = [
-                'Amount' => $postData['Amount'],
-                'BillNo' => $postData['BillNo'],
-                'MerNo'  => $result['mer_no'],
-                'Succeed'=> $postData['Succeed'],
-            ];
+            // 签名校验(暂不做处理)
+            // $authMsgData = [
+            //     'Amount' => $postData['Amount'],
+            //     'BillNo' => $postData['BillNo'],
+            //     'MerNo'  => $result['mer_no'],
+            //     'Succeed'=> $postData['Succeed'],
+            // ];
 
-            $joinMapValue = joinMapValue($authMsgData);
-            $strBeforeMd5 = $joinMapValue . strtoupper(md5(12345678));
-            $MD5Info = strtoupper(md5($strBeforeMd5));
+            // $joinMapValue = joinMapValue($authMsgData);
+            // $strBeforeMd5 = $joinMapValue . strtoupper(md5(12345678));
+            // $MD5Info = strtoupper(md5($strBeforeMd5));
 
-            if($postData['MD5info'] != $MD5Info)
-            {
-                // 签名校验失败 此处应做日志处理...
-                return false;
-            }
+            // if($postData['MD5info'] != $MD5Info)
+            // {
+            //     // 签名校验失败 此处应做日志处理...
+            //     return false;
+            // }
 
             // 查询企业识别码
             $userinfo = Db::name('wh_user')
